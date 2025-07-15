@@ -1,10 +1,9 @@
-const wordLength = (word, number) =>{
-  return word.length <= number;
-};
+const isWordLength = (word, number) => word.length <= number;
+
 
 const palindrome = (word) => {
-  word = word.replaceAll(" ", "").toUpperCase();
-  let reversedWord = "";
+  word = word.replaceAll(' ', '').toUpperCase();
+  let reversedWord = '';
   for(let i = word.length - 1; i >= 0 ; i--){
     reversedWord += word[i];
   }
@@ -17,7 +16,7 @@ const palindrome = (word) => {
 // };     еще один способ
 
 const devise = (oneWord) => {
-  let newOneWord = "";
+  let newOneWord = '';
   for (let i = 0 ; i <= oneWord.length - 1 ; i++){
     const num = parseInt(oneWord[i], 10);
     if (!Number.isNaN(num)){
@@ -25,4 +24,8 @@ const devise = (oneWord) => {
     }
   }
   return newOneWord || NaN;
-}
+};
+
+devise('dsd333');
+isWordLength('pump' , 3);
+palindrome('Pup');
