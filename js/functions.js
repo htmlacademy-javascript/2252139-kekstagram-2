@@ -1,31 +1,29 @@
-const isWordLength = (word, number) => word.length <= number;
+const isStrLengthValid = (str, number) => str.length <= number;
 
+const isPalindrome = (str) => {
+  str = str.replaceAll(' ', '').toUpperCase();
 
-const palindrome = (word) => {
-  word = word.replaceAll(' ', '').toUpperCase();
-  let reversedWord = '';
-  for(let i = word.length - 1; i >= 0 ; i--){
-    reversedWord += word[i];
-  }
-  return word === reversedWord;
-};
-
-// const palindrome = (word) => {
-//   const newWord = word.replaceAll(" ", "").toUpperCase();
-//   return newWord === newWord.split("").reverse().join("");
-// };     еще один способ
-
-const devise = (oneWord) => {
-  let newOneWord = '';
-  for (let i = 0 ; i <= oneWord.length - 1 ; i++){
-    const num = parseInt(oneWord[i], 10);
-    if (!Number.isNaN(num)){
-      newOneWord += oneWord[i];
+  for (let i = 0; i < Math.floor(str.length / 2); i++) {
+    if (str[i] !== str[length - 1 - i]) {
+      return false;
     }
   }
-  return newOneWord || NaN;
+
+  return true;
+};
+
+const devise = (oneStr = '') => {
+  let result = '';
+
+  for (const char of oneStr) {
+    if (!Number.isNaN(parseInt(char, 10))) {
+      result += char;
+    }
+  }
+
+  return result || NaN;
 };
 
 devise('dsd333');
-isWordLength('pump' , 3);
-palindrome('Pup');
+isStrLengthValid('pump', 3);
+isPalindrome('Pup');
