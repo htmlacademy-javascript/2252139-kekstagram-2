@@ -1,10 +1,10 @@
-const isStrLengthValid = (str, number) => str.length <= number;
+const isStrLengthValid = (str, strLength) => str.length <= strLength;
 
 const isPalindrome = (str) => {
-  str = str.replaceAll(' ', '').toUpperCase();
+  const strInverted = str.replaceAll(' ', '').toUpperCase();
 
-  for (let i = 0; i < Math.floor(str.length / 2); i++) {
-    if (str[i] !== str[str.length - 1 - i]) {
+  for (let i = 0; i < Math.floor(strInverted.length / 2); i++) {
+    if (strInverted[i] !== strInverted[strInverted.length - 1 - i]) {
       return false;
     }
   }
@@ -12,10 +12,10 @@ const isPalindrome = (str) => {
   return true;
 };
 
-const devise = (oneStr = '') => {
+const extractNumbersFromStr = (str = '') => {
   let result = '';
 
-  for (const char of oneStr) {
+  for (const char of str) {
     if (!Number.isNaN(parseInt(char, 10))) {
       result += char;
     }
@@ -24,6 +24,6 @@ const devise = (oneStr = '') => {
   return result || NaN;
 };
 
-devise('dsd333');
+extractNumbersFromStr('dsd333');
 isStrLengthValid('pump', 3);
 isPalindrome('Pup');
