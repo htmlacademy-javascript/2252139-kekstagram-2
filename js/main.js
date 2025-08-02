@@ -2,6 +2,7 @@ const getRandomInteger = (a, b) => {
   const lower = Math.ceil(Math.min(a, b));
   const upper = Math.floor(Math.max(a, b));
   const result = Math.random() * (upper - lower + 1) + lower;
+
   return Math.floor(result);
 };
 
@@ -9,7 +10,7 @@ const NAMES = [
   'Муса',
   'Муслим',
   'Мустафа',
-  'Мусавара ',
+  'Мусавара',
   'Мусавара',
   'Мусавата'
 ];
@@ -24,27 +25,36 @@ const COMMENTS = [
   'Зачем это в интернете? Хотите чтобы все видели как вы выглядите?'
 ];
 
+const MIN_LIKES = 15;
+const MAX_LIKES = 200;
+const MIN_AVATAR_ID = 1;
+const MAX_AVATAR_ID = 6;
+const MIN_COMMENTS = 0;
+const MAX_COMMENTS = 30;
+const ID_INCREMENT = 1;
+
 const getRandomArrayElement = (elements) =>
   elements[getRandomInteger(0, elements.length - 1)];
 
-const generateComments = (count) => (
-
+const generateComments = (count) =>
   Array.from({ length: count }, (_, i) => ({
-    id: i + 1,
-    avatar: `img/avatar-${getRandomInteger(1, 6)}.svg`,
+    id: i + ID_INCREMENT,
+    avatar: `img/avatar-${getRandomInteger(MIN_AVATAR_ID, MAX_AVATAR_ID)}.svg`,
     message: getRandomArrayElement(COMMENTS),
     name: getRandomArrayElement(NAMES),
-  }))
-);
+  }));
 
-const getCreatPhotoDescription = (index) => ({
-  id: index + 1,
-  url: `photos/${index + 1}.jpg`,
+const createPhoto = (id) => ({
+  id: id + ID_INCREMENT,
+  url: `photos/${id + ID_INCREMENT}.jpg`,
   description: 'Мир животных',
-  likes: getRandomInteger(15, 200),
+  likes: getRandomInteger(MIN_LIKES, MAX_LIKES),
   name: getRandomArrayElement(NAMES),
-  avatar: `img/avatar-${getRandomInteger(1, 6)}.svg`,
-  comments: generateComments(getRandomInteger(0, 30))
+  avatar: `img/avatar-${getRandomInteger(MIN_AVATAR_ID, MAX_AVATAR_ID)}.svg`,
+  comments: generateComments(getRandomInteger(MIN_COMMENTS, MAX_COMMENTS)),
 });
 
-Array.from({ length: 25 }, (_, index) => getCreatPhotoDescription(index));
+const createPhotosArray = (MAX_PHOTOS) =>
+  Array.from({ length: MAX_PHOTOS }, (_, index) => createPhoto(index));
+
+createPhotosArray(2);

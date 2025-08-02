@@ -1,10 +1,10 @@
 const isStrLengthValid = (str, strLength) => str.length <= strLength;
 
 const isPalindrome = (str) => {
-  const strInverted = str.replaceAll(' ', '').toUpperCase();
+  const transformedStr = str.replaceAll(' ', '').toUpperCase();
 
-  for (let i = 0; i < Math.floor(strInverted.length / 2); i++) {
-    if (strInverted[i] !== strInverted[strInverted.length - 1 - i]) {
+  for (let i = 0; i < Math.floor(transformedStr.length / 2); i++) {
+    if (transformedStr[i] !== transformedStr[transformedStr.length - 1 - i]) {
       return false;
     }
   }
