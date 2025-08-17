@@ -54,7 +54,7 @@ const createPhoto = (id) => ({
   comments: generateComments(getRandomInteger(MIN_COMMENTS, MAX_COMMENTS)),
 });
 
-const createPhotosArray = (MAX_PHOTOS) =>
-  Array.from({ length: MAX_PHOTOS }, (_, index) => createPhoto(index));
+const createGallery = (maxPhotos) =>
+  Array.from({ length: maxPhotos }, (_, index) => createPhoto(index));
 
-createPhotosArray(2);
+createGallery(2);
