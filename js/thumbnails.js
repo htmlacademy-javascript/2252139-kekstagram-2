@@ -1,23 +1,29 @@
 import {createGallery} from './data';
 
 const pictureList = document.querySelector('.pictures');
-const similarGalleryTemplate = document.querySelector('#picture').content.querySelector('.picture');
-const similarGallery = createGallery(3);
-const fragment = document.createDocumentFragment();
+const pictureTemplate = document.querySelector('#picture').content.querySelector('.picture');
+const gallery = createGallery(3);
 
-const renderGallery = () =>{
-  similarGallery.forEach((element) => {
-    const galleryElement = similarGalleryTemplate.cloneNode(true);
+const createPictureEl = (pictureData) => {
+  const galleryElement = pictureTemplate.cloneNode(true);
 
-    galleryElement.querySelector('.picture__img').src = element.url;
-    galleryElement.querySelector('.picture__img').alt = element.description;
-    galleryElement.querySelector('.picture__likes').textContent = element.likes;
-    galleryElement.querySelector('.picture__comments').textContent = element.comments.length;
+  galleryElement.querySelector('.picture__img').src = pictureData.url;
+  galleryElement.querySelector('.picture__img').alt = pictureData.description;
+  galleryElement.querySelector('.picture__likes').textContent = pictureData.likes;
+  galleryElement.querySelector('.picture__comments').textContent = pictureData.comments.length;
 
-    fragment.appendChild(galleryElement);
+  return galleryElement;
+};
+
+const renderGallery = (pictures) => {
+  const fragment = document.createDocumentFragment();
+
+  pictures.forEach((picture) => {
+    const pictureElement = createPictureEl(picture);
+    fragment.appendChild(pictureElement);
   });
 
   pictureList.appendChild(fragment);
 };
 
-renderGallery();
+renderGallery(gallery);
