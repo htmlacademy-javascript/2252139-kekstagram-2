@@ -23,11 +23,11 @@ const MIN_LIKES = 15;
 const MAX_LIKES = 200;
 const MIN_AVATAR_ID = 1;
 const MAX_AVATAR_ID = 6;
-const MIN_COMMENTS = 0;
+const MIN_COMMENTS = 5;
 const MAX_COMMENTS = 30;
 const ID_INCREMENT = 1;
 
-const generateComments = (count) =>
+export const generateComments = (count) =>
   Array.from({ length: count }, (_, i) => ({
     id: i + ID_INCREMENT,
     avatar: `img/avatar-${getRandomInteger(MIN_AVATAR_ID, MAX_AVATAR_ID)}.svg`,

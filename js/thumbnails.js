@@ -1,8 +1,8 @@
-import {createGallery} from './data';
+import {createGallery, generateComments} from './data';
 
-const pictureList = document.querySelector('.pictures');
+export const pictureList = document.querySelector('.pictures');
 const pictureTemplate = document.querySelector('#picture').content.querySelector('.picture');
-const gallery = createGallery(3);
+export const gallery = createGallery(10);
 
 const createPictureEl = (pictureData) => {
   const galleryElement = pictureTemplate.cloneNode(true);
@@ -15,7 +15,7 @@ const createPictureEl = (pictureData) => {
   return galleryElement;
 };
 
-const renderGallery = (pictures) => {
+export const renderGallery = (pictures) => {
   const fragment = document.createDocumentFragment();
 
   pictures.forEach((picture) => {
@@ -26,4 +26,19 @@ const renderGallery = (pictures) => {
   pictureList.appendChild(fragment);
 };
 
-renderGallery(gallery);
+export const createCommentator = (quantity) => {
+  const socialComments = document.querySelector('.social__comments');
+  const fragment = document.createDocumentFragment();
+  const randomComments = generateComments(quantity - 2);
+
+  randomComments.forEach((comment) => {
+    const commentElement = document.createElement('li');
+    commentElement.innerHTML = `
+      <img class="social__picture" src="${comment.avatar}" alt="${comment.name}" width="35" height="35">
+      <p class="social__text">${comment.message}</p>
+    `;
+    fragment.appendChild(commentElement);
+  });
+
+  socialComments.appendChild(fragment);
+};
