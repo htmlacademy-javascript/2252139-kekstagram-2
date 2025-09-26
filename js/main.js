@@ -1,3 +1,1 @@
-import{createGallery} from './data';
-
-createGallery(2);
+import './thumbnails';

@@ -1,4 +1,4 @@
-const getRandomInteger = (a, b) => {
+export const getRandomInteger = (a, b) => {
   const lower = Math.ceil(Math.min(a, b));
   const upper = Math.floor(Math.max(a, b));
   const result = Math.random() * (upper - lower + 1) + lower;
@@ -6,8 +6,5 @@ const getRandomInteger = (a, b) => {
   return Math.floor(result);
 };
 
-const getRandomArrayElement = (elements) =>
+export const getRandomArrayElement = (elements) =>
   elements[getRandomInteger(0, elements.length - 1)];
-
-
-export{getRandomInteger,getRandomArrayElement};

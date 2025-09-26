@@ -1,4 +1,4 @@
-import{getRandomInteger,getRandomArrayElement} from './util';
+import {getRandomInteger, getRandomArrayElement} from './utils';
 
 const NAMES = [
   'Муса',
@@ -45,7 +45,5 @@ const createPhoto = (id) => ({
   comments: generateComments(getRandomInteger(MIN_COMMENTS, MAX_COMMENTS)),
 });
 
-const createGallery = (maxPhotos) =>
+export const createGallery = (maxPhotos) =>
   Array.from({ length: maxPhotos }, (_, index) => createPhoto(index));
-
-export{createGallery};
