@@ -1,2 +1,2 @@
-import './thumbnails';
+import './gallery';
 import './fullscreen-picture';
