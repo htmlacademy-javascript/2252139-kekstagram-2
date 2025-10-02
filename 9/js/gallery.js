@@ -40,7 +40,7 @@ const createPictureEl = (pictureData) => {
   return galleryElement;
 };
 
-export const getPhotoById = (id) => gallery.find((photo) => photo.id === id);
+const getPhotoById = (id) => gallery.find((photo) => photo.id === id);
 
 const renderGallery = (data) => {
   const fragment = document.createDocumentFragment();
@@ -57,10 +57,11 @@ renderGallery(gallery);
 
 pictureList.addEventListener('click', (evt) => {
   const pictureElement = evt.target.closest('.picture');
-  const photoId = parseInt(pictureElement.dataset.id, 10);
   if (!pictureElement || !pictureElement.dataset.id) {
     return;
   }
+
+  const photoId = parseInt(pictureElement.dataset.id, 10);
 
   const photoData = getPhotoById(photoId);
 

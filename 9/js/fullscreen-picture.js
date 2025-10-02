@@ -15,18 +15,19 @@ const bigPictureClosedElement = bigPicture.querySelector('.cancel');
 const socialComments = document.querySelector('.social__comments');
 
 
-const onDocumentKeydown = (evt) => {
+function onDocumentKeydown (evt){
   if (isEscapeKey(evt.key)) {
     evt.preventDefault();
     bigPicture.classList.add('hidden');
+    closePhotoModal();
   }
-};
+}
 
-const closePhotoModal = () => {
+function closePhotoModal () {
   bigPicture.classList.add('hidden');
   document.body.classList.remove('modal-open');
   document.removeEventListener('keydown', onDocumentKeydown);
-};
+}
 
 const openPhotoModal = () =>{
   bigPicture.classList.remove('hidden');
