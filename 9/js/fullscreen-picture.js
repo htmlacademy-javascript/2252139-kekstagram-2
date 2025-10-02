@@ -1,8 +1,9 @@
-import {renderGallery, getPhotoById} from './thumbnails';
 import {isEscapeKey} from './utils';
 
 const COMMENTS_SHOWN = 5;
 
+document.querySelector('.social__comment-count').classList.add('hidden');
+document.querySelector('.comments-loader').classList.add('hidden'); /*Временно скрываю */
 const commentTemplate = document.querySelector('#comment').content.querySelector('.social__comment');
 const bigPicture = document.querySelector('.big-picture');
 const bigPictureImg = document.querySelector('.big-picture__img img');
@@ -11,9 +12,8 @@ const bigPictureShownCount = document.querySelector('.social__comment-shown-coun
 const bigPictureTotalCount = document.querySelector('.social__comment-total-count');
 const bigPictureDescription = document.querySelector('.social__caption');
 const bigPictureClosedElement = bigPicture.querySelector('.cancel');
-const pictures = document.querySelector('.pictures');
+const socialComments = document.querySelector('.social__comments');
 
-renderGallery();
 
 const onDocumentKeydown = (evt) => {
   if (isEscapeKey(evt.key)) {
@@ -22,15 +22,15 @@ const onDocumentKeydown = (evt) => {
   }
 };
 
-const closeUserModal = () => {
+const closePhotoModal = () => {
   bigPicture.classList.add('hidden');
-
+  document.body.classList.remove('modal-open');
   document.removeEventListener('keydown', onDocumentKeydown);
 };
 
 const openPhotoModal = () =>{
   bigPicture.classList.remove('hidden');
-
+  document.body.classList.add('modal-open');
   document.addEventListener('keydown', onDocumentKeydown);
 };
 
@@ -45,10 +45,7 @@ const createCommentElement = (comment) => {
 };
 
 const createComments = (comments, limit) => {
-  const socialComments = document.querySelector('.social__comments');
-
   const limitedComments = comments.slice(0, limit);
-
   const fragment = document.createDocumentFragment();
 
   limitedComments.forEach((comment) => {
@@ -58,7 +55,8 @@ const createComments = (comments, limit) => {
   socialComments.append(fragment);
 };
 
-const openBigPicture = (photoData) => {
+export const openBigPicture = (photoData) => {
+  socialComments.innerHTML = '';
   createComments(photoData.comments, COMMENTS_SHOWN);
 
   bigPictureDescription.textContent = photoData.description;
@@ -68,23 +66,9 @@ const openBigPicture = (photoData) => {
   bigPictureImg.src = photoData.url;
 
   openPhotoModal();
-
-  document.body.classList.add('modal-open');
-
-  document.querySelector('.social__comment-count').classList.add('hidden');
-  document.querySelector('.comments-loader').classList.add('hidden'); /*Временно скрываю */
 };
 
-pictures.addEventListener('click', (evt) => {
-  const pictureElement = evt.target.closest('.picture');
-
-  const photoId = parseInt(pictureElement.dataset.id, 10);
-
-  const photoData = getPhotoById(photoId);
-
-  openBigPicture(photoData);
-});
 
 bigPictureClosedElement.addEventListener('click', () => {
-  closeUserModal();
+  closePhotoModal();
 });
