@@ -1,2 +1,2 @@
-import './gallery';
-import './fullscreen-picture';
+import './gallery.js';
+import './fullscreen-picture.js';
