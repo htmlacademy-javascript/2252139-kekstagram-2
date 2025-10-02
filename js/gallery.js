@@ -40,7 +40,7 @@ const createPictureEl = (pictureData) => {
   return galleryElement;
 };
 
-export const getPhotoById = (id) => gallery.find((photo) => photo.id === id);
+const getPhotoById = (id) => gallery.find((photo) => photo.id === id);
 
 const renderGallery = (data) => {
   const fragment = document.createDocumentFragment();
