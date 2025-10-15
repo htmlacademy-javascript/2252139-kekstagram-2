@@ -1,9 +1,7 @@
 import {isEscapeKey} from './utils.js';
 
-const COMMENTS_SHOWN = 5;
+let COMMENTS_SHOWN = 5;
 
-document.querySelector('.social__comment-count').classList.add('hidden');
-document.querySelector('.comments-loader').classList.add('hidden'); /*Временно скрываю */
 const commentTemplate = document.querySelector('#comment').content.querySelector('.social__comment');
 const bigPicture = document.querySelector('.big-picture');
 const bigPictureImg = document.querySelector('.big-picture__img img');
@@ -13,7 +11,9 @@ const bigPictureTotalCount = document.querySelector('.social__comment-total-coun
 const bigPictureDescription = document.querySelector('.social__caption');
 const bigPictureClosedElement = bigPicture.querySelector('.cancel');
 const socialComments = document.querySelector('.social__comments');
+const bigPictureCommentsLoader = bigPicture.querySelector('.comments-loader');
 
+let currentPhotoData = null;
 
 function onDocumentKeydown (evt){
   if (isEscapeKey(evt.key)) {
@@ -26,6 +26,8 @@ function closePhotoModal () {
   bigPicture.classList.add('hidden');
   document.body.classList.remove('modal-open');
   document.removeEventListener('keydown', onDocumentKeydown);
+
+  COMMENTS_SHOWN = 5;
 }
 
 const openPhotoModal = () => {
@@ -57,20 +59,44 @@ const createComments = (comments, limit) => {
   socialComments.append(fragment);
 };
 
+const updateComments = (photoData) => {
+  if (!photoData) {
+    return;
+  }
+
+  socialComments.innerHTML = '';
+
+  const totalComments = photoData.comments.length;
+  const commentsToShow = Math.min(COMMENTS_SHOWN, totalComments);
+
+  createComments(photoData.comments, commentsToShow);
+  bigPictureShownCount.textContent = commentsToShow;
+  bigPictureTotalCount.textContent = totalComments;
+
+  bigPictureCommentsLoader.classList.toggle('hidden', commentsToShow >= totalComments);
+};
+
 export const openBigPicture = (photoData) => {
   socialComments.innerHTML = '';
-  createComments(photoData.comments, COMMENTS_SHOWN);
 
+  currentPhotoData = photoData;
   bigPictureDescription.textContent = photoData.description;
-  bigPictureShownCount.textContent = COMMENTS_SHOWN;
-  bigPictureTotalCount.textContent = photoData.comments.length;
   bigPictureLikes.textContent = photoData.likes;
   bigPictureImg.src = photoData.url;
 
+  updateComments(currentPhotoData);
   openPhotoModal();
 };
 
 
 bigPictureClosedElement.addEventListener('click', () => {
   closePhotoModal();
+});
+
+bigPictureCommentsLoader.addEventListener('click',(evt) => {
+  evt.preventDefault();
+
+  COMMENTS_SHOWN += 5;
+
+  updateComments(currentPhotoData);
 });
