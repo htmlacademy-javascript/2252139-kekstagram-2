@@ -57,12 +57,12 @@ renderGallery(gallery);
 
 pictureList.addEventListener('click', (evt) => {
   const pictureElement = evt.target.closest('.picture');
+
   if (!pictureElement || !pictureElement.dataset.id) {
     return;
   }
 
   const photoId = parseInt(pictureElement.dataset.id, 10);
-
   const photoData = getPhotoById(photoId);
 
   openBigPicture(photoData);

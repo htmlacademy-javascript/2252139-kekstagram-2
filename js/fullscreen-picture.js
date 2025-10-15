@@ -18,7 +18,6 @@ const socialComments = document.querySelector('.social__comments');
 function onDocumentKeydown (evt){
   if (isEscapeKey(evt.key)) {
     evt.preventDefault();
-    bigPicture.classList.add('hidden');
     closePhotoModal();
   }
 }
@@ -29,7 +28,7 @@ function closePhotoModal () {
   document.removeEventListener('keydown', onDocumentKeydown);
 }
 
-const openPhotoModal = () =>{
+const openPhotoModal = () => {
   bigPicture.classList.remove('hidden');
   document.body.classList.add('modal-open');
   document.addEventListener('keydown', onDocumentKeydown);
@@ -51,8 +50,10 @@ const createComments = (comments, limit) => {
 
   limitedComments.forEach((comment) => {
     const commentElement = createCommentElement(comment);
+
     fragment.appendChild(commentElement);
   });
+
   socialComments.append(fragment);
 };
 
