@@ -1,7 +1,5 @@
 import {isEscapeKey} from './utils.js';
 
-let COMMENTS_SHOWN = 5;
-
 const commentTemplate = document.querySelector('#comment').content.querySelector('.social__comment');
 const bigPicture = document.querySelector('.big-picture');
 const bigPictureImg = document.querySelector('.big-picture__img img');
@@ -13,6 +11,7 @@ const bigPictureClosedElement = bigPicture.querySelector('.cancel');
 const socialComments = document.querySelector('.social__comments');
 const bigPictureCommentsLoader = bigPicture.querySelector('.comments-loader');
 
+let updatedСomments = 5;
 let currentPhotoData = null;
 
 function onDocumentKeydown (evt){
@@ -27,7 +26,8 @@ function closePhotoModal () {
   document.body.classList.remove('modal-open');
   document.removeEventListener('keydown', onDocumentKeydown);
 
-  COMMENTS_SHOWN = 5;
+  updatedСomments = 5;
+  currentPhotoData = null;
 }
 
 const openPhotoModal = () => {
@@ -46,11 +46,10 @@ const createCommentElement = (comment) => {
   return commentElement;
 };
 
-const createComments = (comments, limit) => {
-  const limitedComments = comments.slice(0, limit);
+const renderComments = (comments) => {
   const fragment = document.createDocumentFragment();
 
-  limitedComments.forEach((comment) => {
+  comments.forEach((comment) => {
     const commentElement = createCommentElement(comment);
 
     fragment.appendChild(commentElement);
@@ -59,21 +58,24 @@ const createComments = (comments, limit) => {
   socialComments.append(fragment);
 };
 
-const updateComments = (photoData) => {
-  if (!photoData) {
+const updateComments = () => {
+  if (!currentPhotoData) {
     return;
   }
 
   socialComments.innerHTML = '';
 
-  const totalComments = photoData.comments.length;
-  const commentsToShow = Math.min(COMMENTS_SHOWN, totalComments);
+  const totalComments = currentPhotoData.comments.length;
+  const commentsToShow = Math.min(updatedСomments, totalComments);
+  const limitedComments = currentPhotoData.comments.slice(0, commentsToShow);
 
-  createComments(photoData.comments, commentsToShow);
+  renderComments(limitedComments);
   bigPictureShownCount.textContent = commentsToShow;
   bigPictureTotalCount.textContent = totalComments;
 
   bigPictureCommentsLoader.classList.toggle('hidden', commentsToShow >= totalComments);
+
+  updatedСomments += 5;
 };
 
 export const openBigPicture = (photoData) => {
@@ -84,7 +86,7 @@ export const openBigPicture = (photoData) => {
   bigPictureLikes.textContent = photoData.likes;
   bigPictureImg.src = photoData.url;
 
-  updateComments(currentPhotoData);
+  updateComments();
   openPhotoModal();
 };
 
@@ -96,7 +98,5 @@ bigPictureClosedElement.addEventListener('click', () => {
 bigPictureCommentsLoader.addEventListener('click',(evt) => {
   evt.preventDefault();
 
-  COMMENTS_SHOWN += 5;
-
-  updateComments(currentPhotoData);
+  updateComments();
 });
