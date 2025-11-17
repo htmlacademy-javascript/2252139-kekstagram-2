@@ -9,10 +9,11 @@ const descriptionInput = imgUploadForm.querySelector('.text__description');
 
 const isInputFocused = () => {
   const activeElement = document.activeElement;
+
   return activeElement === descriptionInput || activeElement === imgHashtags;
 };
 
-const closeOverlay = () => {
+const onOverlayClose = () => {
   imgUploadOverlay.classList.add('hidden');
   document.body.classList.remove('modal-open');
 
@@ -20,24 +21,20 @@ const closeOverlay = () => {
   document.removeEventListener('keydown', onDocumentKeydown);
 };
 
-const openOverlay = () => {
+const onOverlayOpen = () => {
   imgUploadOverlay.classList.remove('hidden');
   document.body.classList.add('modal-open');
-
   document.addEventListener('keydown', onDocumentKeydown);
 };
 
 imgUploadInput.addEventListener('change', () =>{
-  openOverlay();
+  onOverlayOpen();
 });
 
-imgUploadCancel.addEventListener('click', closeOverlay);
+imgUploadCancel.addEventListener('click', onOverlayClose);
 
 function onDocumentKeydown (evt) {
-  if (isEscapeKey(evt.key)) {
+  if (isEscapeKey(evt.key) && !isInputFocused) {
     evt.preventDefault();
-    if(!isInputFocused){
-      closeOverlay();
-    }
   }
 }
