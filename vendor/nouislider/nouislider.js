@@ -2253,3 +2253,125 @@
   Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
+
+const imgUploadSlider = document.querySelector('.effect-level__slider');
+const imgUploadValue = document.querySelector('.effect-level__value');
+const effectsList = document.querySelector('.effects__list');
+const imgPreview = document.querySelector('.img-upload__preview img');
+
+imgUploadValue.value = 80;
+document.querySelector('.effect-level').style.display = 'none';
+
+noUiSlider.create(imgUploadSlider, {
+  range: {
+    min:0,
+    max:100,
+  },
+  start:100,
+  connect:'lower',
+  step:1,
+});
+
+let currentEffect = 'none';
+
+imgUploadSlider.noUiSlider.on('update', () => {
+  const value = imgUploadSlider.noUiSlider.get()
+  applyEffect(currentEffect, value);
+});
+
+
+function applyEffect(effect, value) {
+  switch(effect) {
+    case 'chrome':
+      imgPreview.style.filter = `grayscale(${value})`;
+      document.querySelector('.effect-level').style.display = 'block';
+      break;
+
+    case 'none':
+      imgPreview.style.filter = 'none';
+      break;
+
+    case 'sepia':
+      imgPreview.style.filter = `sepia(${value})`;
+      document.querySelector('.effect-level').style.display = 'block';
+      break;
+
+    case 'marvin':
+      imgPreview.style.filter = `invert(${value}%)`;
+      document.querySelector('.effect-level').style.display = 'block';
+      break;
+
+    case 'phobos':
+      imgPreview.style.filter = `blur(${value}px)`;
+      document.querySelector('.effect-level').style.display = 'block';
+      break;
+
+    case 'heat':
+      imgPreview.style.filter = `brightness(${value})`;
+      document.querySelector('.effect-level').style.display = 'block';
+      break;
+
+    default:
+      imgPreview.style.filter = 'none';
+  }
+}
+
+effectsList.addEventListener('change', (evt) => {
+  if(evt.target.type === 'radio'){
+    currentEffect = evt.target.value;
+    if(currentEffect === 'chrome'){
+      imgUploadSlider.noUiSlider.updateOptions({
+        range: {
+          min: 0,
+          max: 1
+        },
+        start: 1,
+        step: 0.1
+      })
+      applyEffect(currentEffect, 1);
+    }else if(currentEffect === 'none') {
+       imgPreview.style.filter = 'none';
+       document.querySelector('.effect-level').style.display = 'none';
+    }else if(currentEffect === 'sepia'){
+      imgUploadSlider.noUiSlider.updateOptions({
+        range: {
+          min: 0,
+          max: 1
+        },
+        start: 1,
+        step: 0.1
+      })
+      applyEffect(currentEffect, 1);
+    }else if(currentEffect === 'marvin'){
+      imgUploadSlider.noUiSlider.updateOptions({
+        range: {
+          min: 0,
+          max: 100
+        },
+        start: 100,
+        step: 1
+      })
+      applyEffect(currentEffect, 100);
+    }else if(currentEffect === 'phobos'){
+      imgUploadSlider.noUiSlider.updateOptions({
+        range: {
+          min: 0,
+          max: 3
+        },
+        start: 3,
+        step: 0.1
+      })
+      applyEffect(currentEffect, 3);
+    }else if(currentEffect === 'heat'){
+      imgUploadSlider.noUiSlider.updateOptions({
+        range: {
+          min: 1,
+          max: 3
+        },
+        start: 3,
+        step: 0.1
+      })
+      applyEffect(currentEffect, 3);
+    }
+  }
+})

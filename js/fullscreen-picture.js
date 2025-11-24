@@ -1,5 +1,7 @@
 import {isEscapeKey} from './utils.js';
 
+const COMMENTS_SHOWN = 5;
+const DEFAULT_COMMENTS_COUNT = '0';
 const commentTemplate = document.querySelector('#comment').content.querySelector('.social__comment');
 const bigPicture = document.querySelector('.big-picture');
 const bigPictureImg = document.querySelector('.big-picture__img img');
@@ -10,7 +12,6 @@ const bigPictureDescription = document.querySelector('.social__caption');
 const bigPictureClosedElement = bigPicture.querySelector('.cancel');
 const socialComments = document.querySelector('.social__comments');
 const bigPictureCommentsLoader = bigPicture.querySelector('.comments-loader');
-const COMMENTS_SHOWN = 5;
 
 let visibleСomments = COMMENTS_SHOWN;
 let currentPhotoData = null;
@@ -29,8 +30,8 @@ function closePhotoModal () {
 
   visibleСomments = COMMENTS_SHOWN;
   currentPhotoData = null;
-  bigPictureShownCount.textContent = '0';
-  bigPictureTotalCount.textContent = '0';
+  bigPictureShownCount.textContent = DEFAULT_COMMENTS_COUNT;
+  bigPictureTotalCount.textContent = DEFAULT_COMMENTS_COUNT;
 }
 
 const openPhotoModal = () => {
