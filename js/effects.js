@@ -8,6 +8,7 @@ const SEPIA_MAX_RANGE = 1;
 const PHOBOS_MAX_RANGE = 3;
 const HEAT_MIN_RANGE = 1;
 const HEAT_MAX_RANGE = 3;
+const NONE = 'none';
 const EffectConfig = {
   chrome: {
     range: { min: DEFAULT_MIN_RANGE, max: CHROME_MAX_RANGE },
@@ -53,12 +54,12 @@ const imgPreview = document.querySelector('.img-upload__preview img');
 const effectLevelElement = document.querySelector('.effect-level');
 const defaultConfig = EffectConfig.none;
 
-let currentEffect = 'none';
+let currentEffect = NONE;
 
-export const resetSlider = () => {
+const resetSlider = () => {
   imgUploadValue.value = DEFAULT_MAX_VALUE;
-  effectLevelElement.style.display = 'none';
-  imgPreview.style.filter = 'none';
+  effectLevelElement.style.display = NONE;
+  imgPreview.style.filter = NONE;
 
   noUiSlider.create(imgUploadSlider, {
     range: defaultConfig.range,
@@ -70,39 +71,32 @@ export const resetSlider = () => {
 
 resetSlider();
 
-const applyEffect = (effect, value) => {
+export const applyEffect = (effect, value) => {
   switch(effect) {
     case 'chrome':
       imgPreview.style.filter = `grayscale(${value})`;
-      effectLevelElement.style.display = 'block';
-      break;
-
-    case 'none':
-      imgPreview.style.filter = 'none';
       break;
 
     case 'sepia':
       imgPreview.style.filter = `sepia(${value})`;
-      effectLevelElement.style.display = 'block';
       break;
 
     case 'marvin':
       imgPreview.style.filter = `invert(${value}%)`;
-      effectLevelElement.style.display = 'block';
       break;
 
     case 'phobos':
       imgPreview.style.filter = `blur(${value}px)`;
-      effectLevelElement.style.display = 'block';
       break;
 
     case 'heat':
       imgPreview.style.filter = `brightness(${value})`;
-      effectLevelElement.style.display = 'block';
       break;
 
+    case 'none':
     default:
-      imgPreview.style.filter = 'none';
+      imgPreview.style.filter = NONE;
+      effectLevelElement.style.display = NONE;
   }
 };
 
@@ -111,22 +105,18 @@ imgUploadSlider.noUiSlider.on('update', () => {
   applyEffect(currentEffect, value);
 });
 
-
 effectsList.addEventListener('change', (evt) => {
   if(evt.target.type === 'radio'){
     currentEffect = evt.target.value;
-    const config = EffectConfig[currentEffect];
+    const config = EffectConfig[currentEffect] ?? EffectConfig.none;
+    effectLevelElement.style.display = 'block';
 
-    if (currentEffect === 'none') {
-      resetSlider();
-    } else {
-      imgUploadSlider.noUiSlider.updateOptions({
-        range: config.range,
-        start: config.start,
-        step: config.step,
-      });
+    imgUploadSlider.noUiSlider.updateOptions({
+      range: config.range,
+      start: config.start,
+      step: config.step,
+    });
 
-      applyEffect(currentEffect, config.initialValue);
-    }
+    applyEffect(currentEffect, config.initialValue);
   }
 });

@@ -1,6 +1,10 @@
 import {isEscapeKey} from './utils.js';
-import {resetSlider} from './effect-slider.js';
+import {applyEffect} from './effects.js';
 
+const ScaleDirection = {
+  SMALLER: 'smaller',
+  BIGGER: 'bigger'
+};
 const SCALE_FACTOR = 0.01;
 const MAX_SCALE = 100;
 const MIN_SCALE = 25;
@@ -24,7 +28,7 @@ const isInputFocused = () => {
   return activeElement === descriptionInput || activeElement === imgHashtags;
 };
 
-const closeImageEditor = () => {
+const onCloseImageEditor = () => {
   imgUploadOverlay.classList.add('hidden');
   document.body.classList.remove('modal-open');
 
@@ -32,12 +36,11 @@ const closeImageEditor = () => {
   document.removeEventListener('keydown', onDocumentKeydown);
   imgUploadPreview.style.transform = DEFAULT_SCALE;
 
-  resetSlider();
+  applyEffect('none');
 };
 
 const applyUploadedImage = () => {
   const file = imgUploadInput.files[0];
-
   if(file) {
     const tempUrl = URL.createObjectURL(file);
     imgUploadPreview.src = tempUrl;
@@ -47,7 +50,7 @@ const applyUploadedImage = () => {
   }
 };
 
-const openImageEditor = () => {
+const onOpenImageEditor = () => {
   imgUploadOverlay.classList.remove('hidden');
   document.body.classList.add('modal-open');
   document.addEventListener('keydown', onDocumentKeydown);
@@ -55,14 +58,14 @@ const openImageEditor = () => {
   applyUploadedImage();
 };
 
-imgUploadInput.addEventListener('change', openImageEditor);
+imgUploadInput.addEventListener('change', onOpenImageEditor);
 
-imgUploadCancel.addEventListener('click', closeImageEditor);
+imgUploadCancel.addEventListener('click', onCloseImageEditor);
 
 function onDocumentKeydown (evt) {
   if (isEscapeKey(evt.key) && !isInputFocused()) {
     evt.preventDefault();
-    closeImageEditor();
+    onCloseImageEditor();
   }
 }
 
@@ -70,18 +73,20 @@ const scalePhoto = (direction) => {
   const currentValue = parseInt(scaleValue.value, 10);
   let newValue = currentValue;
 
-  if (direction === 'smaller') {
+  if (direction === ScaleDirection.SMALLER) {
     newValue = Math.max(MIN_SCALE, currentValue - SCALE_STEP);
-  } else if (direction === 'bigger') {
+  } else if (direction === ScaleDirection.BIGGER) {
     newValue = Math.min(MAX_SCALE, currentValue + SCALE_STEP);
+  } else {
+    throw new Error(`Неизвестное масштабирование: ${direction}`);
   }
 
   scaleValue.value = `${newValue}%`;
   imgUploadPreview.style.transform = `scale(${newValue * SCALE_FACTOR})`;
 };
 
-const onSmallerClick = () => scalePhoto('smaller');
-const onBiggerClick = () => scalePhoto('bigger');
+const onSmallerClick = () => scalePhoto(ScaleDirection.SMALLER);
+const onBiggerClick = () => scalePhoto(ScaleDirection.BIGGER);
 
 scaleSmallerButton.addEventListener('click', onSmallerClick);
 scaleBiggerButton.addEventListener('click', onBiggerClick);
