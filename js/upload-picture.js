@@ -1,5 +1,11 @@
 import {isEscapeKey} from './utils.js';
+import {resetSlider} from './effect-slider.js';
 
+const SCALE_FACTOR = 0.01;
+const MAX_SCALE = 100;
+const MIN_SCALE = 25;
+const SCALE_STEP = 25;
+const DEFAULT_SCALE = 'scale(1)';
 const imgUploadForm = document.querySelector('.img-upload__form');
 const imgUploadInput = imgUploadForm.querySelector('.img-upload__input');
 const imgUploadOverlay = imgUploadForm.querySelector('.img-upload__overlay');
@@ -18,23 +24,20 @@ const isInputFocused = () => {
   return activeElement === descriptionInput || activeElement === imgHashtags;
 };
 
-const onUploadCancelClick = () => {
+const closeImageEditor = () => {
   imgUploadOverlay.classList.add('hidden');
   document.body.classList.remove('modal-open');
 
   imgUploadInput.value = '';
   document.removeEventListener('keydown', onDocumentKeydown);
-  imgUploadPreview.style.transform = 'scale(1)';
+  imgUploadPreview.style.transform = DEFAULT_SCALE;
+
+  resetSlider();
 };
 
-const onOverlayOpen = () => {
-  imgUploadOverlay.classList.remove('hidden');
-  document.body.classList.add('modal-open');
-  document.addEventListener('keydown', onDocumentKeydown);
-};
-
-imgUploadInput.addEventListener('change', () =>{
+const applyUploadedImage = () => {
   const file = imgUploadInput.files[0];
+
   if(file) {
     const tempUrl = URL.createObjectURL(file);
     imgUploadPreview.src = tempUrl;
@@ -42,29 +45,43 @@ imgUploadInput.addEventListener('change', () =>{
       imgPreviewEffect.style.backgroundImage = `url(${tempUrl})`;
     });
   }
-  onOverlayOpen();
-});
+};
 
-imgUploadCancel.addEventListener('click', onUploadCancelClick);
+const openImageEditor = () => {
+  imgUploadOverlay.classList.remove('hidden');
+  document.body.classList.add('modal-open');
+  document.addEventListener('keydown', onDocumentKeydown);
+
+  applyUploadedImage();
+};
+
+imgUploadInput.addEventListener('change', openImageEditor);
+
+imgUploadCancel.addEventListener('click', closeImageEditor);
 
 function onDocumentKeydown (evt) {
   if (isEscapeKey(evt.key) && !isInputFocused()) {
     evt.preventDefault();
-    onUploadCancelClick();
+    closeImageEditor();
   }
 }
 
-const smallerPhoto = () => {
+const scalePhoto = (direction) => {
   const currentValue = parseInt(scaleValue.value, 10);
-  scaleValue.value = `${currentValue - 25}%`;
-  imgUploadPreview.style.transform = `scale(${(currentValue - 25) * 0.01})`;
+  let newValue = currentValue;
+
+  if (direction === 'smaller') {
+    newValue = Math.max(MIN_SCALE, currentValue - SCALE_STEP);
+  } else if (direction === 'bigger') {
+    newValue = Math.min(MAX_SCALE, currentValue + SCALE_STEP);
+  }
+
+  scaleValue.value = `${newValue}%`;
+  imgUploadPreview.style.transform = `scale(${newValue * SCALE_FACTOR})`;
 };
 
-const biggerPhoto = () => {
-  const currentValue = parseInt(scaleValue.value, 10);
-  scaleValue.value = `${currentValue + 25}%`;
-  imgUploadPreview.style.transform = `scale(${(currentValue + 25) * 0.01})`;
-};
+const onSmallerClick = () => scalePhoto('smaller');
+const onBiggerClick = () => scalePhoto('bigger');
 
-scaleSmallerButton.addEventListener('click', smallerPhoto);
-scaleBiggerButton.addEventListener('click', biggerPhoto);
+scaleSmallerButton.addEventListener('click', onSmallerClick);
+scaleBiggerButton.addEventListener('click', onBiggerClick);
