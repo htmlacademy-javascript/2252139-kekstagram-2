@@ -1,15 +1,15 @@
 import {isEscapeKey} from './utils.js';
-import {applyEffect} from './effects.js';
+import {initSlider} from './effects.js';
 
-const ScaleDirection = {
-  SMALLER: 'smaller',
-  BIGGER: 'bigger'
-};
 const SCALE_FACTOR = 0.01;
 const MAX_SCALE = 100;
 const MIN_SCALE = 25;
 const SCALE_STEP = 25;
-const DEFAULT_SCALE = 'scale(1)';
+const ScaleDirection = {
+  SMALLER: 'smaller',
+  BIGGER: 'bigger'
+};
+const FILE_TYPES = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
 const imgUploadForm = document.querySelector('.img-upload__form');
 const imgUploadInput = imgUploadForm.querySelector('.img-upload__input');
 const imgUploadOverlay = imgUploadForm.querySelector('.img-upload__overlay');
@@ -28,26 +28,47 @@ const isInputFocused = () => {
   return activeElement === descriptionInput || activeElement === imgHashtags;
 };
 
+const resetUploadedImage = () => {
+  imgUploadPreview.src = '';
+
+  imgPreviewEffects.forEach((imgPreviewEffect) => {
+    imgPreviewEffect.style.backgroundImage = '';
+  });
+
+  imgUploadInput.value = '';
+};
+
 const onCloseImageEditor = () => {
   imgUploadOverlay.classList.add('hidden');
   document.body.classList.remove('modal-open');
-
-  imgUploadInput.value = '';
   document.removeEventListener('keydown', onDocumentKeydown);
-  imgUploadPreview.style.transform = DEFAULT_SCALE;
+  imgUploadPreview.removeAttribute('style');
 
-  applyEffect('none');
+  initSlider();
+  resetUploadedImage();
 };
 
 const applyUploadedImage = () => {
   const file = imgUploadInput.files[0];
-  if(file) {
-    const tempUrl = URL.createObjectURL(file);
-    imgUploadPreview.src = tempUrl;
-    imgPreviewEffects.forEach((imgPreviewEffect) =>{
-      imgPreviewEffect.style.backgroundImage = `url(${tempUrl})`;
-    });
+
+  if (!file) {
+    return;
   }
+
+  const fileName = file.name.toLowerCase();
+  const validImage = FILE_TYPES.some((type) => fileName.endsWith(type));
+
+  if (!validImage) {
+    imgUploadInput.value = '';
+    return;
+  }
+
+  const tempUrl = URL.createObjectURL(file);
+  imgUploadPreview.src = tempUrl;
+
+  imgPreviewEffects.forEach((imgPreviewEffect) => {
+    imgPreviewEffect.style.backgroundImage = `url(${tempUrl})`;
+  });
 };
 
 const onOpenImageEditor = () => {
@@ -73,12 +94,17 @@ const scalePhoto = (direction) => {
   const currentValue = parseInt(scaleValue.value, 10);
   let newValue = currentValue;
 
-  if (direction === ScaleDirection.SMALLER) {
-    newValue = Math.max(MIN_SCALE, currentValue - SCALE_STEP);
-  } else if (direction === ScaleDirection.BIGGER) {
-    newValue = Math.min(MAX_SCALE, currentValue + SCALE_STEP);
-  } else {
-    throw new Error(`Неизвестное масштабирование: ${direction}`);
+  switch (direction) {
+    case ScaleDirection.SMALLER:
+      newValue = Math.max(MIN_SCALE, currentValue - SCALE_STEP);
+      break;
+
+    case ScaleDirection.BIGGER:
+      newValue = Math.min(MAX_SCALE, currentValue + SCALE_STEP);
+      break;
+
+    default:
+      throw new Error(`Неизвестное масштабирование: ${direction}`);
   }
 
   scaleValue.value = `${newValue}%`;
