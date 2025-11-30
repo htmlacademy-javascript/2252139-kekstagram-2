@@ -47,29 +47,32 @@ const EffectConfig = {
     initialValue: DEFAULT_MAX_VALUE
   }
 };
+
 const imgUploadSlider = document.querySelector('.effect-level__slider');
 const imgUploadValue = document.querySelector('.effect-level__value');
 const effectsList = document.querySelector('.effects__list');
 const imgPreview = document.querySelector('.img-upload__preview img');
 const effectLevelElement = document.querySelector('.effect-level');
-const defaultConfig = EffectConfig.none;
 
 let currentEffect = NONE;
 
-const resetSlider = () => {
-  imgUploadValue.value = DEFAULT_MAX_VALUE;
-  effectLevelElement.style.display = NONE;
-  imgPreview.style.filter = NONE;
-
+export const initSlider = () => {
   noUiSlider.create(imgUploadSlider, {
-    range: defaultConfig.range,
-    start: defaultConfig.start,
+    range: EffectConfig.none.range,
+    start: EffectConfig.none.start,
     connect: 'lower',
-    step: defaultConfig.step
+    step: EffectConfig.none.step
   });
 };
 
-resetSlider();
+const resetSlider = () => {
+  imgUploadValue.value = DEFAULT_MAX_VALUE;
+  imgPreview.style.filter = 'none';
+  currentEffect = NONE;
+  effectLevelElement.classList.add('hidden');
+};
+
+initSlider();
 
 export const applyEffect = (effect, value) => {
   switch(effect) {
@@ -95,8 +98,7 @@ export const applyEffect = (effect, value) => {
 
     case 'none':
     default:
-      imgPreview.style.filter = NONE;
-      effectLevelElement.style.display = NONE;
+      resetSlider();
   }
 };
 
@@ -106,10 +108,11 @@ imgUploadSlider.noUiSlider.on('update', () => {
 });
 
 effectsList.addEventListener('change', (evt) => {
-  if(evt.target.type === 'radio'){
+  if (evt.target.type === 'radio') {
     currentEffect = evt.target.value;
     const config = EffectConfig[currentEffect] ?? EffectConfig.none;
-    effectLevelElement.style.display = 'block';
+
+    effectLevelElement.classList.remove('hidden');
 
     imgUploadSlider.noUiSlider.updateOptions({
       range: config.range,
