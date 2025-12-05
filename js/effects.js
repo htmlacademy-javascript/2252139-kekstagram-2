@@ -14,31 +14,41 @@ const EffectConfig = {
     range: { min: DEFAULT_MIN_RANGE, max: CHROME_MAX_RANGE },
     start: 1,
     step: MIN_STEP,
-    initialValue: 1
+    initialValue: 1,
+    type: 'grayscale',
+    unit:''
   },
   sepia: {
     range: { min: DEFAULT_MIN_RANGE, max: SEPIA_MAX_RANGE },
     start: 1,
     step: MIN_STEP,
-    initialValue: 1
+    initialValue: 1,
+    type: 'sepia',
+    unit:''
   },
   marvin: {
     range: { min: DEFAULT_MIN_RANGE, max: DEFAULT_MAX_RANGE },
     start: DEFAULT_MAX_VALUE,
     step: DEFAULT_STEP,
-    initialValue: DEFAULT_MAX_VALUE
+    initialValue: DEFAULT_MAX_VALUE,
+    type: 'invert',
+    unit:'%'
   },
   phobos: {
     range: { min: DEFAULT_MIN_RANGE, max: PHOBOS_MAX_RANGE },
     start: PHOBOS_MAX_RANGE,
     step: MIN_STEP,
-    initialValue: PHOBOS_MAX_RANGE
+    initialValue: PHOBOS_MAX_RANGE,
+    type: 'blur',
+    unit:'px'
   },
   heat: {
     range: { min: HEAT_MIN_RANGE, max: HEAT_MAX_RANGE },
     start: HEAT_MAX_RANGE,
     step: MIN_STEP,
-    initialValue: HEAT_MAX_RANGE
+    initialValue: HEAT_MAX_RANGE,
+    type: 'brightness',
+    unit:''
   },
   none: {
     range: { min: DEFAULT_MIN_RANGE, max: DEFAULT_MAX_RANGE },
@@ -53,53 +63,31 @@ const imgUploadValue = document.querySelector('.effect-level__value');
 const effectsList = document.querySelector('.effects__list');
 const imgPreview = document.querySelector('.img-upload__preview img');
 const effectLevelElement = document.querySelector('.effect-level');
+const noneRadio = document.querySelector('#effect-none');
 
-let currentEffect = NONE;
+let currentEffect = EffectConfig.none;
 
-export const initSlider = () => {
-  noUiSlider.create(imgUploadSlider, {
-    range: EffectConfig.none.range,
-    start: EffectConfig.none.start,
-    connect: 'lower',
-    step: EffectConfig.none.step
-  });
-};
+noUiSlider.create(imgUploadSlider, {
+  range: EffectConfig.none.range,
+  start: EffectConfig.none.start,
+  connect: 'lower',
+  step: EffectConfig.none.step
+});
 
-const resetSlider = () => {
+effectLevelElement.classList.add('hidden');
+
+export const resetEffectAndSlider = () => {
   imgUploadValue.value = DEFAULT_MAX_VALUE;
-  imgPreview.style.filter = 'none';
-  currentEffect = NONE;
+  imgPreview.style.filter = NONE;
+  currentEffect = EffectConfig.none;
   effectLevelElement.classList.add('hidden');
+  noneRadio.checked = true;
 };
 
-initSlider();
+const applyEffect = (currentFilter, value) => {
+  const { unit, type } = currentFilter;
 
-export const applyEffect = (effect, value) => {
-  switch(effect) {
-    case 'chrome':
-      imgPreview.style.filter = `grayscale(${value})`;
-      break;
-
-    case 'sepia':
-      imgPreview.style.filter = `sepia(${value})`;
-      break;
-
-    case 'marvin':
-      imgPreview.style.filter = `invert(${value}%)`;
-      break;
-
-    case 'phobos':
-      imgPreview.style.filter = `blur(${value}px)`;
-      break;
-
-    case 'heat':
-      imgPreview.style.filter = `brightness(${value})`;
-      break;
-
-    case 'none':
-    default:
-      resetSlider();
-  }
+  imgPreview.style.filter = `${type}(${value}${unit})`;
 };
 
 imgUploadSlider.noUiSlider.on('update', () => {
@@ -109,17 +97,21 @@ imgUploadSlider.noUiSlider.on('update', () => {
 
 effectsList.addEventListener('change', (evt) => {
   if (evt.target.type === 'radio') {
-    currentEffect = evt.target.value;
-    const config = EffectConfig[currentEffect] ?? EffectConfig.none;
+    currentEffect = EffectConfig[evt.target.value] ?? EffectConfig.none;
 
     effectLevelElement.classList.remove('hidden');
 
+    if (currentEffect === EffectConfig.none) {
+      resetEffectAndSlider();
+      return;
+    }
+
     imgUploadSlider.noUiSlider.updateOptions({
-      range: config.range,
-      start: config.start,
-      step: config.step,
+      range: currentEffect.range,
+      start: currentEffect.start,
+      step: currentEffect.step,
     });
 
-    applyEffect(currentEffect, config.initialValue);
+    applyEffect(currentEffect, currentEffect.initialValue);
   }
 });

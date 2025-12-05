@@ -1,5 +1,5 @@
 import {isEscapeKey} from './utils.js';
-import {initSlider} from './effects.js';
+import {resetEffectAndSlider} from './effects.js';
 
 const SCALE_FACTOR = 0.01;
 const MAX_SCALE = 100;
@@ -28,12 +28,21 @@ const isInputFocused = () => {
   return activeElement === descriptionInput || activeElement === imgHashtags;
 };
 
-const resetUploadedImage = () => {
-  imgUploadPreview.src = '';
+const updateScaleValue = (value) => {
+  scaleValue.value = `${value}%`;
+  imgUploadPreview.style.transform = `scale(${value * SCALE_FACTOR})`;
+};
+
+const applyPreviewImg = (url, src) => {
+  imgUploadPreview.src = src;
 
   imgPreviewEffects.forEach((imgPreviewEffect) => {
-    imgPreviewEffect.style.backgroundImage = '';
+    imgPreviewEffect.style.backgroundImage = url;
   });
+};
+
+const resetUploadedImage = () => {
+  applyPreviewImg('', '');
 
   imgUploadInput.value = '';
 };
@@ -44,31 +53,34 @@ const onCloseImageEditor = () => {
   document.removeEventListener('keydown', onDocumentKeydown);
   imgUploadPreview.removeAttribute('style');
 
-  initSlider();
+  resetEffectAndSlider();
   resetUploadedImage();
+  updateScaleValue(MAX_SCALE);
 };
-
-const applyUploadedImage = () => {
-  const file = imgUploadInput.files[0];
-
+const isValidImageFile = (file) => {
   if (!file) {
-    return;
+    return false;
   }
 
   const fileName = file.name.toLowerCase();
   const validImage = FILE_TYPES.some((type) => fileName.endsWith(type));
 
   if (!validImage) {
+    return false;
+  }
+};
+
+const applyUploadedImage = () => {
+  const file = imgUploadInput.files[0];
+
+  if(!isValidImageFile(file)){
     imgUploadInput.value = '';
     return;
   }
 
   const tempUrl = URL.createObjectURL(file);
-  imgUploadPreview.src = tempUrl;
-
-  imgPreviewEffects.forEach((imgPreviewEffect) => {
-    imgPreviewEffect.style.backgroundImage = `url(${tempUrl})`;
-  });
+  const bgUrl = `url(${tempUrl})`;
+  applyPreviewImg(bgUrl, tempUrl);
 };
 
 const onOpenImageEditor = () => {
@@ -107,8 +119,7 @@ const scalePhoto = (direction) => {
       throw new Error(`Неизвестное масштабирование: ${direction}`);
   }
 
-  scaleValue.value = `${newValue}%`;
-  imgUploadPreview.style.transform = `scale(${newValue * SCALE_FACTOR})`;
+  updateScaleValue(newValue);
 };
 
 const onSmallerClick = () => scalePhoto(ScaleDirection.SMALLER);
