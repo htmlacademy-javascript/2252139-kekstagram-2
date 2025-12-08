@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="vendor/nouislider/nouislider.css">
   <link rel="stylesheet" href="css/normalize.css">
   <link rel="stylesheet" href="css/style.css">
   <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
@@ -34,7 +35,7 @@
 
             <!-- Изначальное состояние поля для загрузки изображения -->
             <fieldset class="img-upload__start">
-              <input type="file" id="upload-file" class="img-upload__input  visually-hidden" name="filename" required>
+              <input type="file" id="upload-file" class="img-upload__input  visually-hidden" name="filename" accept=".jpg, .jpeg, .png, .gif, .webp" required>
               <label for="upload-file" class="img-upload__label  img-upload__control">Загрузить</label>
             </fieldset>
 
@@ -233,8 +234,9 @@
       </section>
     </template>
 
+    <script src="./vendor/pristine/pristine.min.js"></script>
+    <script src="./vendor/nouislider/nouislider.js"></script>
     <script src="./js/functions.js"></script>
     <script type="module" src="./js/main.js"></script>
-    <script> src="'./vendor/pristine/pristine.min.js';"</script>
 </body>
 </html>
