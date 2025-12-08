@@ -8,7 +8,6 @@ const SEPIA_MAX_RANGE = 1;
 const PHOBOS_MAX_RANGE = 3;
 const HEAT_MIN_RANGE = 1;
 const HEAT_MAX_RANGE = 3;
-const NONE = 'none';
 const EffectConfig = {
   chrome: {
     range: { min: DEFAULT_MIN_RANGE, max: CHROME_MAX_RANGE },
@@ -59,11 +58,10 @@ const EffectConfig = {
 };
 
 const imgUploadSlider = document.querySelector('.effect-level__slider');
-const imgUploadValue = document.querySelector('.effect-level__value');
 const effectsList = document.querySelector('.effects__list');
 const imgPreview = document.querySelector('.img-upload__preview img');
 const effectLevelElement = document.querySelector('.effect-level');
-const noneRadio = document.querySelector('#effect-none');
+const form = document.querySelector('.img-upload__form');
 
 let currentEffect = EffectConfig.none;
 
@@ -77,11 +75,10 @@ noUiSlider.create(imgUploadSlider, {
 effectLevelElement.classList.add('hidden');
 
 export const resetEffectAndSlider = () => {
-  imgUploadValue.value = DEFAULT_MAX_VALUE;
-  imgPreview.style.filter = NONE;
+  imgPreview.removeAttribute('style');
   currentEffect = EffectConfig.none;
   effectLevelElement.classList.add('hidden');
-  noneRadio.checked = true;
+  form.reset();
 };
 
 const applyEffect = (currentFilter, value) => {

@@ -63,11 +63,7 @@ const isValidImageFile = (file) => {
   }
 
   const fileName = file.name.toLowerCase();
-  const validImage = FILE_TYPES.some((type) => fileName.endsWith(type));
-
-  if (!validImage) {
-    return false;
-  }
+  return FILE_TYPES.some((type) => fileName.endsWith(type));
 };
 
 const applyUploadedImage = () => {
