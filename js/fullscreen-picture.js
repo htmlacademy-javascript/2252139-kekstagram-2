@@ -23,7 +23,7 @@ function onDocumentKeydown (evt){
   }
 }
 
-function closePhotoModal () {
+export function closePhotoModal () {
   bigPicture.classList.add('hidden');
   document.body.classList.remove('modal-open');
   document.removeEventListener('keydown', onDocumentKeydown);
@@ -93,7 +93,6 @@ export const openBigPicture = (photoData) => {
   updateComments();
   openPhotoModal();
 };
-
 
 bigPictureClosedElement.addEventListener('click', () => {
   closePhotoModal();
