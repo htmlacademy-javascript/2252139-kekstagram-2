@@ -28,6 +28,7 @@ const SubmitButtonText = {
   SENDING: 'Сохраняю...'
 };
 
+
 const load = (route, errorText, method = Method.GET, body = null) =>
   fetch(`${BASE_URL}${route}`, {method, body})
     .then((response) => {
