@@ -47,7 +47,7 @@ const resetUploadedImage = () => {
   imgUploadInput.value = '';
 };
 
-const onCloseImageEditor = () => {
+export const onCloseImageEditor = () => {
   imgUploadOverlay.classList.add('hidden');
   document.body.classList.remove('modal-open');
   document.removeEventListener('keydown', onDocumentKeydown);

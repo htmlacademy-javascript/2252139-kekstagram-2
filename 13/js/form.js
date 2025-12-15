@@ -1,6 +1,6 @@
 import {renderGallery, setGalleryData} from './gallery.js';
 import {showErrorMessage} from './utils.js';
-import { closePhotoModal } from './fullscreen-picture.js';
+import { onCloseImageEditor } from './upload-picture.js';
 
 const hashtagPattern = /^#[a-zа-яё0-9]{1,19}$/i;
 const MAX_HASHTAGS = 5;
@@ -105,7 +105,7 @@ imgUploadForm.addEventListener('submit', async (evt) => {
       toggleSubmitButton(true);
 
       await sendData(new FormData(evt.target));
-      closePhotoModal();
+      onCloseImageEditor();
     } catch (err) {
       showErrorMessage(err.message);
     } finally {
