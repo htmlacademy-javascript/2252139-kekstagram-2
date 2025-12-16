@@ -47,7 +47,7 @@ const resetUploadedImage = () => {
   imgUploadInput.value = '';
 };
 
-const onCloseImageEditor = () => {
+export const onCloseImageEditor = () => {
   imgUploadOverlay.classList.add('hidden');
   document.body.classList.remove('modal-open');
   document.removeEventListener('keydown', onDocumentKeydown);
@@ -63,11 +63,7 @@ const isValidImageFile = (file) => {
   }
 
   const fileName = file.name.toLowerCase();
-  const validImage = FILE_TYPES.some((type) => fileName.endsWith(type));
-
-  if (!validImage) {
-    return false;
-  }
+  return FILE_TYPES.some((type) => fileName.endsWith(type));
 };
 
 const applyUploadedImage = () => {
