@@ -1,6 +1,6 @@
-import {renderGallery, setGalleryData} from './gallery.js';
-import {showErrorMessage} from './utils.js';
+import {errorMessageSendPhoto, successMessageSendPhoto} from './dialogs.js';
 import { onCloseImageEditor } from './upload-picture.js';
+import { sendPhoto } from './api.js';
 
 const hashtagPattern = /^#[a-zа-яё0-9]{1,19}$/i;
 const MAX_HASHTAGS = 5;
@@ -10,51 +10,10 @@ const imgUploadSubmit = imgUploadForm.querySelector('.img-upload__submit');
 const descriptionInput = imgUploadForm.querySelector('.text__description');
 const hashtagsInput = imgUploadForm.querySelector('.text__hashtags');
 
-const BASE_URL = 'https://31.javascript.htmlacademy.pro/kekstagram';
-const Route = {
-  GET_DATA: '/data',
-  SEND_DATA: '/',
-};
-const Method = {
-  GET: 'GET',
-  POST: 'POST',
-};
-const ErrorText = {
-  GET_DATA: 'Не удалось загрузить данные. Попробуйте обновить страницу',
-  SEND_DATA: 'Не удалось отправить форму. Попробуйте ещё раз',
-};
 const SubmitButtonText = {
   IDLE: 'Сохранить',
   SENDING: 'Сохраняю...'
 };
-
-
-const load = (route, errorText, method = Method.GET, body = null) =>
-  fetch(`${BASE_URL}${route}`, {method, body})
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error();
-      }
-      return response.json();
-    })
-    .catch(() => {
-      throw new Error(errorText);
-    });
-
-const getData = () => load(Route.GET_DATA, ErrorText.GET_DATA);
-
-export const sendData = (body) => load(Route.SEND_DATA, ErrorText.SEND_DATA, Method.POST, body);
-
-getData()
-  .then((gallery) => {
-    renderGallery(gallery);
-    setGalleryData(gallery);
-  })
-  .catch(
-    (err) => {
-      showErrorMessage(err.message);
-    }
-  );
 
 const toggleSubmitButton = (disabled) => {
   imgUploadSubmit.disabled = disabled;
@@ -78,17 +37,29 @@ const isHashtagsValid = (value) => {
 
   const hashtagsArray = trimmedValue.split(/\s+/);
 
-  if (hashtagsArray.length > MAX_HASHTAGS) {
-    return false;
-  }
-
-  const uniqueHashtags = new Set(hashtagsArray.map((h) => h.toLowerCase()));
-
-  if (uniqueHashtags.size !== hashtagsArray.length) {
-    return false;
-  }
-
   return hashtagsArray.every((hashtag) => hashtagPattern.test(hashtag));
+};
+
+const isMaxHashtagsValid = (value) => {
+  const trimmedValue = value.trim();
+  const hashtags = trimmedValue.split(/\s+/);
+  if (trimmedValue === '') {
+    return true;
+  }
+
+  return hashtags.length <= MAX_HASHTAGS;
+};
+
+const isUniqueHashtagsValid = (value) => {
+  const trimmedValue = value.trim();
+
+  if (trimmedValue === '') {
+    return true;
+  }
+
+  const hashtags = trimmedValue.split(/\s+/);
+  const uniqueHashtags = new Set(hashtags.map((h) => h.toLowerCase()));
+  return uniqueHashtags.size === hashtags.length;
 };
 
 const isDescriptionValid = (value) =>
@@ -96,6 +67,8 @@ const isDescriptionValid = (value) =>
 
 pristine.addValidator(hashtagsInput, isHashtagsValid, 'введён невалидный хэштег');
 pristine.addValidator(descriptionInput, isDescriptionValid, 'длина комментария больше 140 символов.');
+pristine.addValidator(hashtagsInput, isMaxHashtagsValid, `Не более ${MAX_HASHTAGS} хэштегов`);
+pristine.addValidator(hashtagsInput, isUniqueHashtagsValid, 'Хэштеги повторяются.');
 
 imgUploadForm.addEventListener('submit', async (evt) => {
   evt.preventDefault();
@@ -105,10 +78,11 @@ imgUploadForm.addEventListener('submit', async (evt) => {
     try {
       toggleSubmitButton(true);
 
-      await sendData(new FormData(evt.target));
+      await sendPhoto(new FormData(evt.target));
       onCloseImageEditor();
+      successMessageSendPhoto();
     } catch (err) {
-      showErrorMessage(err.message);
+      errorMessageSendPhoto(err.message);
     } finally {
       toggleSubmitButton(false);
     }
@@ -118,4 +92,3 @@ imgUploadForm.addEventListener('submit', async (evt) => {
     hashtagsInput.focus();
   }
 });
-

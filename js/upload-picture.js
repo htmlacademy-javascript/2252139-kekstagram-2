@@ -92,7 +92,9 @@ imgUploadInput.addEventListener('change', onOpenImageEditor);
 imgUploadCancel.addEventListener('click', onCloseImageEditor);
 
 function onDocumentKeydown (evt) {
-  if (isEscapeKey(evt.key) && !isInputFocused()) {
+  const isErrorMessageOpen = document.querySelector('.error');
+
+  if (isEscapeKey(evt.key) && !isInputFocused() && !isErrorMessageOpen) {
     evt.preventDefault();
     onCloseImageEditor();
   }
