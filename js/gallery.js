@@ -46,3 +46,9 @@ pictureList.addEventListener('click', (evt) => {
 
   openBigPicture(photoData);
 });
+
+export const clearGallery = () => {
+  const galleryItems = document.querySelectorAll('.picture');
+
+  galleryItems.forEach((item) => item.remove());
+};
