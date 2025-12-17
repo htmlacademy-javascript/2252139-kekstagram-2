@@ -1,89 +1,89 @@
 import { isEscapeKey } from './utils.js';
 
-const onDocumentKeydown = (value) => (evt) => {
-  if (isEscapeKey(evt.key)) {
+let currentDialog = null;
+let currentEscapeHandler = null;
+let currentOutsideClickHandler = null;
+
+const errorTemplate = document.querySelector('#error');
+const successTemplate = document.querySelector('#success');
+const dataErrorTemplate = document.querySelector('#data-error');
+
+const descriptionInput = document.querySelector('.text__description');
+const imgHashtags = document.querySelector('.text__hashtags');
+
+const canCloseModal = () => {
+  const activeElement = document.activeElement;
+  const isInputFocused = activeElement === descriptionInput || activeElement === imgHashtags;
+  return !isInputFocused && !document.querySelector('.error');
+};
+
+const createEscapeHandler = (closeCallback) => (evt) => {
+  if (isEscapeKey(evt.key) && canCloseModal()) {
     evt.preventDefault();
-    value();
+    closeCallback();
   }
 };
 
-const onOutsideClick = (value, sendingSuccess) => (evt) => {
-  const Element = document.querySelector(`.${value}`);
-  const InnerElement = document.querySelector(`.${value}__inner`);
-
-  if (Element && !InnerElement.contains(evt.target)) {
-    sendingSuccess();
+const createOutsideClickHandler = (closeCallback) => (evt) => {
+  if (currentDialog && !currentDialog.contains(evt.target)) {
+    closeCallback();
   }
 };
 
-const onCloseErrorButtonClick = () =>
-  closeErrorMessageSendPhoto();
-
-function closeErrorMessageSendPhoto () {
-  const messageElement = document.querySelector('.error');
-  const errorButtonMessageSend = document.querySelector('.error__button');
-
-  if (messageElement) {
-    messageElement.remove();
-    document.removeEventListener('keydown', onDocumentKeydown(closeErrorMessageSendPhoto));
-    document.removeEventListener('click', onOutsideClick('error', closeErrorMessageSendPhoto));
-    errorButtonMessageSend.removeEventListener('click', onCloseErrorButtonClick);
+const cleanupEventListeners = () => {
+  if (currentEscapeHandler) {
+    document.removeEventListener('keydown', currentEscapeHandler);
+    currentEscapeHandler = null;
   }
-}
 
-export const errorMessageSendPhoto = () => {
-  const errorTemplate = document.querySelector('#error');
-  const errorElement = errorTemplate.content.cloneNode(true);
+  if (currentOutsideClickHandler) {
+    document.removeEventListener('click', currentOutsideClickHandler);
+    currentOutsideClickHandler = null;
+  }
+};
 
+const closeDialog = () => {
+  if (currentDialog) {
+    currentDialog.remove();
+    currentDialog = null;
+    cleanupEventListeners();
+  }
+};
+
+const openDialog = (template, className, closeCallback = closeDialog) => {
+  closeDialog();
+
+  const dialogElement = template.content.cloneNode(true);
+  document.body.appendChild(dialogElement);
+  currentDialog = document.querySelector(`.${className}`);
+
+  const dialogButton = currentDialog.querySelector(`.${className}__button`);
+
+  currentEscapeHandler = createEscapeHandler(closeCallback);
+  currentOutsideClickHandler = createOutsideClickHandler(closeCallback);
+
+  document.addEventListener('keydown', currentEscapeHandler);
+  document.addEventListener('click', currentOutsideClickHandler);
+  dialogButton.addEventListener('click', closeCallback);
+};
+
+export const showError = () => {
+  openDialog(errorTemplate, 'error');
+};
+
+export const showSuccess = () => {
+  openDialog(successTemplate, 'success');
+};
+
+export const showDataError = () => {
+  const errorElement = dataErrorTemplate.content.cloneNode(true);
   document.body.appendChild(errorElement);
 
-  const errorButtonMessageSend = document.querySelector('.error__button');
-
-  document.addEventListener('keydown', onDocumentKeydown(closeErrorMessageSendPhoto));
-  document.addEventListener('click', onOutsideClick('error', closeErrorMessageSendPhoto));
-  errorButtonMessageSend.addEventListener('click', onCloseErrorButtonClick);
-};
-
-export const errorMessageGetPhotos = () => {
-  const errorTemplate = document.querySelector('#data-error');
-  const errorElement = errorTemplate.content.cloneNode(true);
-
-  document.body.appendChild(errorElement);
-
-  const errorMessage = document.body.lastElementChild;
+  const errorMessage = document.querySelector('.data-error');
 
   setTimeout(() => {
-    if (errorMessage && errorMessage.parentNode) {
+    if (errorMessage) {
       errorMessage.remove();
     }
   }, 5000);
 };
-
-const onCloseSuccessButtonClick = () =>
-  closeSuccessMessageSendPhoto();
-
-function closeSuccessMessageSendPhoto () {
-  const messageElement = document.querySelector('.success');
-  const successButtonMessageSend = document.querySelector('.success__button');
-
-  if (messageElement) {
-    messageElement.remove();
-    document.removeEventListener('keydown', onDocumentKeydown(closeSuccessMessageSendPhoto));
-    document.removeEventListener('click', onOutsideClick('success', closeSuccessMessageSendPhoto));
-    successButtonMessageSend.removeEventListener('click', onCloseSuccessButtonClick);
-  }
-}
-
-export const successMessageSendPhoto = () => {
-  const SuccessTemplate = document.querySelector('#success');
-  const SuccessElement = SuccessTemplate.content.cloneNode(true);
-
-  document.body.appendChild(SuccessElement);
-
-  const successButtonMessageSend = document.querySelector('.success__button');
-
-  document.addEventListener('keydown', onDocumentKeydown(closeSuccessMessageSendPhoto));
-  document.addEventListener('click', onOutsideClick('success', closeSuccessMessageSendPhoto));
-  successButtonMessageSend.addEventListener('click', onCloseSuccessButtonClick);
-};
-

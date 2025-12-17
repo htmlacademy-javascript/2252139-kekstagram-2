@@ -1,19 +1,24 @@
-import {errorMessageSendPhoto, successMessageSendPhoto} from './dialogs.js';
+import {showError, showSuccess} from './dialogs.js';
 import { onCloseImageEditor } from './upload-picture.js';
 import { sendPhoto } from './api.js';
 
 const hashtagPattern = /^#[a-zа-яё0-9]{1,19}$/i;
 const MAX_HASHTAGS = 5;
 const MAX_DESCRIPTION_LEN = 140;
-const imgUploadForm = document.querySelector('.img-upload__form');
-const imgUploadSubmit = imgUploadForm.querySelector('.img-upload__submit');
-const descriptionInput = imgUploadForm.querySelector('.text__description');
-const hashtagsInput = imgUploadForm.querySelector('.text__hashtags');
-
+const ErrorMessage = {
+  INVALID_HASHTAG: 'Введён невалидный хэштег',
+  DESCRIPTION_TOO_LONG: 'Длина комментария больше 140 символов',
+  HASHTAGS_TOO_MUCH: `Не более ${MAX_HASHTAGS} хэштегов`,
+  HASHTAGS_UNIQUE:'Хэштеги повторяются.'
+};
 const SubmitButtonText = {
   IDLE: 'Сохранить',
   SENDING: 'Сохраняю...'
 };
+const imgUploadForm = document.querySelector('.img-upload__form');
+const imgUploadSubmit = imgUploadForm.querySelector('.img-upload__submit');
+const descriptionInput = imgUploadForm.querySelector('.text__description');
+const hashtagsInput = imgUploadForm.querySelector('.text__hashtags');
 
 const toggleSubmitButton = (disabled) => {
   imgUploadSubmit.disabled = disabled;
@@ -28,47 +33,31 @@ const pristine = new Pristine(imgUploadForm, {
   errorTextClass: 'img-upload__field-wrapper--error'
 });
 
-const isHashtagsValid = (value) => {
+const getHashtags = (value) => {
   const trimmedValue = value.trim();
-
-  if (trimmedValue === '') {
-    return true;
-  }
-
-  const hashtagsArray = trimmedValue.split(/\s+/);
-
-  return hashtagsArray.every((hashtag) => hashtagPattern.test(hashtag));
+  return trimmedValue === '' ? [] : trimmedValue.split(/\s+/);
 };
 
-const isMaxHashtagsValid = (value) => {
-  const trimmedValue = value.trim();
-  const hashtags = trimmedValue.split(/\s+/);
-  if (trimmedValue === '') {
-    return true;
-  }
+const isHashtagsValid = (value) =>
+  getHashtags(value).every((hashtag) => hashtagPattern.test(hashtag));
 
-  return hashtags.length <= MAX_HASHTAGS;
-};
+const isHashtagsCountValid = (value) =>
+  getHashtags(value).length <= MAX_HASHTAGS;
 
-const isUniqueHashtagsValid = (value) => {
-  const trimmedValue = value.trim();
-
-  if (trimmedValue === '') {
-    return true;
-  }
-
-  const hashtags = trimmedValue.split(/\s+/);
+const isHashtagsUnique = (value) => {
+  const hashtags = getHashtags(value);
   const uniqueHashtags = new Set(hashtags.map((h) => h.toLowerCase()));
+
   return uniqueHashtags.size === hashtags.length;
 };
 
 const isDescriptionValid = (value) =>
   value.trim() === '' || value.length <= MAX_DESCRIPTION_LEN;
 
-pristine.addValidator(hashtagsInput, isHashtagsValid, 'введён невалидный хэштег');
-pristine.addValidator(descriptionInput, isDescriptionValid, 'длина комментария больше 140 символов.');
-pristine.addValidator(hashtagsInput, isMaxHashtagsValid, `Не более ${MAX_HASHTAGS} хэштегов`);
-pristine.addValidator(hashtagsInput, isUniqueHashtagsValid, 'Хэштеги повторяются.');
+pristine.addValidator(hashtagsInput, isHashtagsValid, ErrorMessage.INVALID_HASHTAG);
+pristine.addValidator(descriptionInput, isDescriptionValid, ErrorMessage.DESCRIPTION_TOO_LONG);
+pristine.addValidator(hashtagsInput, isHashtagsCountValid, ErrorMessage.HASHTAGS_TOO_MUCH);
+pristine.addValidator(hashtagsInput, isHashtagsUnique, ErrorMessage.HASHTAGS_UNIQUE);
 
 imgUploadForm.addEventListener('submit', async (evt) => {
   evt.preventDefault();
@@ -80,9 +69,9 @@ imgUploadForm.addEventListener('submit', async (evt) => {
 
       await sendPhoto(new FormData(evt.target));
       onCloseImageEditor();
-      successMessageSendPhoto();
+      showSuccess();
     } catch (err) {
-      errorMessageSendPhoto(err.message);
+      showError(err.message);
     } finally {
       toggleSubmitButton(false);
     }

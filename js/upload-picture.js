@@ -91,10 +91,11 @@ imgUploadInput.addEventListener('change', onOpenImageEditor);
 
 imgUploadCancel.addEventListener('click', onCloseImageEditor);
 
-function onDocumentKeydown (evt) {
-  const isErrorMessageOpen = document.querySelector('.error');
+const canCloseModal = () =>
+  !isInputFocused() && !document.querySelector('.error');
 
-  if (isEscapeKey(evt.key) && !isInputFocused() && !isErrorMessageOpen) {
+function onDocumentKeydown (evt) {
+  if (isEscapeKey(evt.key) && canCloseModal()) {
     evt.preventDefault();
     onCloseImageEditor();
   }
@@ -125,3 +126,4 @@ const onBiggerClick = () => scalePhoto(ScaleDirection.BIGGER);
 
 scaleSmallerButton.addEventListener('click', onSmallerClick);
 scaleBiggerButton.addEventListener('click', onBiggerClick);
+
