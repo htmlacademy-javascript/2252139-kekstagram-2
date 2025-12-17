@@ -3,6 +3,7 @@ import './fullscreen-picture.js';
 import './upload-picture.js';
 import './form.js';
 import './api.js';
+import './utils.js';
 
 import { errorMessageGetPhotos } from './dialogs.js';
 import {renderGallery, setGalleryData, clearGallery} from './gallery.js';
