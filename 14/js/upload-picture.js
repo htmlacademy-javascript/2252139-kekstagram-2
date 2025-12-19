@@ -91,11 +91,8 @@ imgUploadInput.addEventListener('change', onOpenImageEditor);
 
 imgUploadCancel.addEventListener('click', onCloseImageEditor);
 
-const canCloseModal = () =>
-  !isInputFocused() && !document.querySelector('.error');
-
 function onDocumentKeydown (evt) {
-  if (isEscapeKey(evt.key) && canCloseModal()) {
+  if (isEscapeKey(evt.key) && !isInputFocused()) {
     evt.preventDefault();
     onCloseImageEditor();
   }

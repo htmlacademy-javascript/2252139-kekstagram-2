@@ -5,7 +5,7 @@ import './form.js';
 import './api.js';
 
 import { showDataError } from './dialogs.js';
-import {renderGallery, setGalleryData} from './gallery.js';
+import { renderGallery, setGalleryData } from './gallery.js';
 import { getPhotos } from './api.js';
 import { initFilters } from './filter.js';
 
@@ -14,7 +14,7 @@ try {
   renderGallery(gallery);
   setGalleryData(gallery);
 
-  initFilters(gallery);
+  initFilters();
 } catch (err) {
   showDataError(err.message);
 }

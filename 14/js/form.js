@@ -68,16 +68,12 @@ imgUploadForm.addEventListener('submit', async (evt) => {
       toggleSubmitButton(true);
 
       await sendPhoto(new FormData(evt.target));
-      onCloseImageEditor();
       showSuccess();
+      onCloseImageEditor();
     } catch (err) {
       showError(err.message);
     } finally {
       toggleSubmitButton(false);
     }
-  } else {
-    hashtagsInput.style.borderColor = 'red';
-
-    hashtagsInput.focus();
   }
 });

@@ -1,44 +1,22 @@
 import { isEscapeKey } from './utils.js';
 
 let currentDialog = null;
-let currentEscapeHandler = null;
-let currentOutsideClickHandler = null;
 
 const errorTemplate = document.querySelector('#error');
 const successTemplate = document.querySelector('#success');
 const dataErrorTemplate = document.querySelector('#data-error');
 
-const descriptionInput = document.querySelector('.text__description');
-const imgHashtags = document.querySelector('.text__hashtags');
-
-const canCloseModal = () => {
-  const activeElement = document.activeElement;
-  const isInputFocused = activeElement === descriptionInput || activeElement === imgHashtags;
-  return !isInputFocused && !document.querySelector('.error');
-};
-
 const createEscapeHandler = (closeCallback) => (evt) => {
-  if (isEscapeKey(evt.key) && canCloseModal()) {
+  if (isEscapeKey(evt.key) && currentDialog) {
     evt.preventDefault();
     closeCallback();
+    evt.stopPropagation();
   }
 };
 
 const createOutsideClickHandler = (closeCallback) => (evt) => {
-  if (currentDialog && !currentDialog.contains(evt.target)) {
+  if (evt.target.closest('[data-dialog-close]') || !evt.target.closest('[data-dialog-content]')) {
     closeCallback();
-  }
-};
-
-const cleanupEventListeners = () => {
-  if (currentEscapeHandler) {
-    document.removeEventListener('keydown', currentEscapeHandler);
-    currentEscapeHandler = null;
-  }
-
-  if (currentOutsideClickHandler) {
-    document.removeEventListener('click', currentOutsideClickHandler);
-    currentOutsideClickHandler = null;
   }
 };
 
@@ -46,40 +24,35 @@ const closeDialog = () => {
   if (currentDialog) {
     currentDialog.remove();
     currentDialog = null;
-    cleanupEventListeners();
   }
 };
 
-const openDialog = (template, className, closeCallback = closeDialog) => {
-  closeDialog();
-
+const openDialog = (template) => {
   const dialogElement = template.content.cloneNode(true);
+  const dialogMainElement = dialogElement.children[0];
+
   document.body.appendChild(dialogElement);
-  currentDialog = document.querySelector(`.${className}`);
 
-  const dialogButton = currentDialog.querySelector(`.${className}__button`);
-
-  currentEscapeHandler = createEscapeHandler(closeCallback);
-  currentOutsideClickHandler = createOutsideClickHandler(closeCallback);
-
-  document.addEventListener('keydown', currentEscapeHandler);
-  document.addEventListener('click', currentOutsideClickHandler);
-  dialogButton.addEventListener('click', closeCallback);
+  currentDialog = dialogMainElement;
 };
+document.addEventListener('keydown', createEscapeHandler(closeDialog), { capture: true });
+document.addEventListener('click', createOutsideClickHandler(closeDialog));
 
 export const showError = () => {
-  openDialog(errorTemplate, 'error');
+  openDialog(errorTemplate);
 };
 
 export const showSuccess = () => {
-  openDialog(successTemplate, 'success');
+  openDialog(successTemplate);
 };
 
 export const showDataError = () => {
   const errorElement = dataErrorTemplate.content.cloneNode(true);
+  const errorMainElement = errorElement.children[0];
+
   document.body.appendChild(errorElement);
 
-  const errorMessage = document.querySelector('.data-error');
+  const errorMessage = errorMainElement;
 
   setTimeout(() => {
     if (errorMessage) {
