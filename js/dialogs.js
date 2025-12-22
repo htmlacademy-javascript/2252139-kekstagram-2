@@ -1,42 +1,47 @@
 import { isEscapeKey } from './utils.js';
 
+const ERROR_DISPLAY_DURATION = 5000;
+
 let currentDialog = null;
 
 const errorTemplate = document.querySelector('#error');
 const successTemplate = document.querySelector('#success');
 const dataErrorTemplate = document.querySelector('#data-error');
 
-const createEscapeHandler = (closeCallback) => (evt) => {
+const onCloseKeydown = (evt) => {
   if (isEscapeKey(evt.key) && currentDialog) {
     evt.preventDefault();
-    closeCallback();
+    closeDialog();
     evt.stopPropagation();
   }
 };
 
-const createOutsideClickHandler = (closeCallback) => (evt) => {
-  if (evt.target.closest('[data-dialog-close]') || !evt.target.closest('[data-dialog-content]')) {
-    closeCallback();
-  }
-};
-
-const closeDialog = () => {
+function closeDialog () {
   if (currentDialog) {
     currentDialog.remove();
     currentDialog = null;
+
+    document.removeEventListener('keydown', onCloseKeydown, true);
+  }
+}
+
+const onCloseClick = (evt) => {
+  if (evt.target.closest('[data-dialog-close]') || !evt.target.closest('[data-dialog-content]')) {
+    closeDialog();
   }
 };
 
 const openDialog = (template) => {
-  const dialogElement = template.content.cloneNode(true);
-  const dialogMainElement = dialogElement.children[0];
+  const dialogElement = template.content.firstElementChild.cloneNode(true);
 
   document.body.appendChild(dialogElement);
 
-  currentDialog = dialogMainElement;
+  currentDialog = dialogElement;
+
+  document.addEventListener('keydown', onCloseKeydown, true);
 };
-document.addEventListener('keydown', createEscapeHandler(closeDialog), { capture: true });
-document.addEventListener('click', createOutsideClickHandler(closeDialog));
+
+document.addEventListener('click', onCloseClick);
 
 export const showError = () => {
   openDialog(errorTemplate);
@@ -47,16 +52,13 @@ export const showSuccess = () => {
 };
 
 export const showDataError = () => {
-  const errorElement = dataErrorTemplate.content.cloneNode(true);
-  const errorMainElement = errorElement.children[0];
+  const errorElement = dataErrorTemplate.content.firstElementChild.cloneNode(true);
 
   document.body.appendChild(errorElement);
 
-  const errorMessage = errorMainElement;
-
   setTimeout(() => {
-    if (errorMessage) {
-      errorMessage.remove();
+    if (errorElement) {
+      errorElement.remove();
     }
-  }, 5000);
+  }, ERROR_DISPLAY_DURATION);
 };

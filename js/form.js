@@ -5,7 +5,7 @@ import { sendPhoto } from './api.js';
 const hashtagPattern = /^#[a-zа-яё0-9]{1,19}$/i;
 const MAX_HASHTAGS = 5;
 const MAX_DESCRIPTION_LEN = 140;
-const ErrorMessage = {
+const errorMessage = {
   INVALID_HASHTAG: 'Введён невалидный хэштег',
   DESCRIPTION_TOO_LONG: 'Длина комментария больше 140 символов',
   HASHTAGS_TOO_MUCH: `Не более ${MAX_HASHTAGS} хэштегов`,
@@ -54,10 +54,10 @@ const isHashtagsUnique = (value) => {
 const isDescriptionValid = (value) =>
   value.trim() === '' || value.length <= MAX_DESCRIPTION_LEN;
 
-pristine.addValidator(hashtagsInput, isHashtagsValid, ErrorMessage.INVALID_HASHTAG);
-pristine.addValidator(descriptionInput, isDescriptionValid, ErrorMessage.DESCRIPTION_TOO_LONG);
-pristine.addValidator(hashtagsInput, isHashtagsCountValid, ErrorMessage.HASHTAGS_TOO_MUCH);
-pristine.addValidator(hashtagsInput, isHashtagsUnique, ErrorMessage.HASHTAGS_UNIQUE);
+pristine.addValidator(hashtagsInput, isHashtagsValid, errorMessage.INVALID_HASHTAG);
+pristine.addValidator(descriptionInput, isDescriptionValid, errorMessage.DESCRIPTION_TOO_LONG);
+pristine.addValidator(hashtagsInput, isHashtagsCountValid, errorMessage.HASHTAGS_TOO_MUCH);
+pristine.addValidator(hashtagsInput, isHashtagsUnique, errorMessage.HASHTAGS_UNIQUE);
 
 imgUploadForm.addEventListener('submit', async (evt) => {
   evt.preventDefault();

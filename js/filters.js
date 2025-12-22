@@ -3,6 +3,12 @@ import { renderGallery, clearGallery, getGalleryData } from './gallery.js';
 const filtersContainer = document.querySelector('.img-filters');
 let activeFilterButton = filtersContainer.querySelector('.img-filters__button--active');
 
+const filterName = {
+  FILTER_RANDOM: 'filter-random',
+  FILTER_DISCUSSED: 'filter-discussed',
+  FILTER_DEFAULT: 'filter-default'
+};
+
 const shuffleArray = (data) =>
   data.toSorted(() => Math.random() - 0.5);
 
@@ -13,13 +19,13 @@ const getFilteredData = (filterId) => {
   const galleryData = getGalleryData();
 
   switch (filterId) {
-    case 'filter-random':
-      return shuffleArray([...galleryData]);
+    case filterName.FILTER_RANDOM:
+      return shuffleArray(galleryData);
 
-    case 'filter-discussed':
-      return sortByCommentsCount([...galleryData]);
+    case filterName.FILTER_DISCUSSED:
+      return sortByCommentsCount(galleryData);
 
-    case 'filter-default':
+    case filterName.FILTER_DEFAULT:
     default:
       return galleryData;
   }

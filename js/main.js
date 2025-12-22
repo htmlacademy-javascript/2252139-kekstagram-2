@@ -7,7 +7,7 @@ import './api.js';
 import { showDataError } from './dialogs.js';
 import { renderGallery, setGalleryData } from './gallery.js';
 import { getPhotos } from './api.js';
-import { initFilters } from './filter.js';
+import { initFilters } from './filters.js';
 
 try {
   const gallery = await getPhotos();
