@@ -28,34 +28,33 @@ const getFilteredData = (filterId) => {
     case filterName.FILTER_DISCUSSED:
       return sortByCommentsCount(galleryData);
 
-    case filterName.FILTER_DEFAULT:
     default:
       return galleryData;
   }
 };
 
-const handleFilterClick = (evt) => {
+const debouncedRenderGallery = debounce((filterId) => {
+  const filteredData = getFilteredData(filterId);
+  clearGallery();
+  renderGallery(filteredData);
+}, RERENDER_DELAY);
+
+const onFilterClick = (evt) => {
   const button = evt.target.closest('.img-filters__button');
 
   if (!button) {
     return;
   }
 
-  if (activeFilterButton) {
-    activeFilterButton.classList.remove('img-filters__button--active');
-  }
+  activeFilterButton?.classList.remove('img-filters__button--active');
 
   button.classList.add('img-filters__button--active');
   activeFilterButton = button;
 
-  const filteredData = getFilteredData(button.id);
-
-  clearGallery();
-
-  debounce(() => renderGallery(filteredData), RERENDER_DELAY)();
+  debouncedRenderGallery(button.id);
 };
 
 export const initFilters = () => {
   filtersContainer.classList.remove('img-filters--inactive');
-  filtersContainer.addEventListener('click', handleFilterClick);
+  filtersContainer.addEventListener('click', onFilterClick);
 };
