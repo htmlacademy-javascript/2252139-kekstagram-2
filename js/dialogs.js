@@ -8,7 +8,7 @@ const errorTemplate = document.querySelector('#error');
 const successTemplate = document.querySelector('#success');
 const dataErrorTemplate = document.querySelector('#data-error');
 
-const onCloseKeydown = (evt) => {
+const onDocumentKeydown = (evt) => {
   if (isEscapeKey(evt.key) && currentDialog) {
     evt.preventDefault();
     closeDialog();
@@ -21,27 +21,27 @@ function closeDialog () {
     currentDialog.remove();
     currentDialog = null;
 
-    document.removeEventListener('keydown', onCloseKeydown, true);
+    document.removeEventListener('keydown', onDocumentKeydown, true);
   }
 }
 
-const onCloseClick = (evt) => {
+const onDocumentClick = (evt) => {
   if (evt.target.closest('[data-dialog-close]') || !evt.target.closest('[data-dialog-content]')) {
     closeDialog();
   }
 };
 
 const openDialog = (template) => {
-  const dialogElement = template.content.firstElementChild.cloneNode(true);
+  const dialogElement = template.content.querySelector('[data-dialog-container]').cloneNode(true);
 
   document.body.appendChild(dialogElement);
 
   currentDialog = dialogElement;
 
-  document.addEventListener('keydown', onCloseKeydown, true);
+  document.addEventListener('keydown', onDocumentKeydown, true);
 };
 
-document.addEventListener('click', onCloseClick);
+document.addEventListener('click', onDocumentClick);
 
 export const showError = () => {
   openDialog(errorTemplate);
@@ -52,7 +52,7 @@ export const showSuccess = () => {
 };
 
 export const showDataError = () => {
-  const errorElement = dataErrorTemplate.content.firstElementChild.cloneNode(true);
+  const errorElement = dataErrorTemplate.content.querySelector('.data-error').cloneNode(true);
 
   document.body.appendChild(errorElement);
 

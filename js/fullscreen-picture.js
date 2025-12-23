@@ -13,7 +13,7 @@ const bigPictureClosedElement = bigPicture.querySelector('.cancel');
 const socialComments = document.querySelector('.social__comments');
 const bigPictureCommentsLoader = bigPicture.querySelector('.comments-loader');
 
-let visibleСomments = COMMENTS_SHOWN;
+let visibleComments = COMMENTS_SHOWN;
 let currentPhotoData = null;
 
 const onDocumentKeydown = (evt) => {
@@ -28,7 +28,7 @@ export function closePhotoModal () {
   document.body.classList.remove('modal-open');
   document.removeEventListener('keydown', onDocumentKeydown);
 
-  visibleСomments = COMMENTS_SHOWN;
+  visibleComments = COMMENTS_SHOWN;
   currentPhotoData = null;
   bigPictureShownCount.textContent = DEFAULT_COMMENTS_COUNT;
   bigPictureTotalCount.textContent = DEFAULT_COMMENTS_COUNT;
@@ -70,7 +70,7 @@ const updateComments = () => {
   socialComments.innerHTML = '';
 
   const totalComments = currentPhotoData.comments.length;
-  const commentsToShow = Math.min(visibleСomments, totalComments);
+  const commentsToShow = Math.min(visibleComments, totalComments);
   const limitedComments = currentPhotoData.comments.slice(0, commentsToShow);
 
   renderComments(limitedComments);
@@ -79,7 +79,7 @@ const updateComments = () => {
 
   bigPictureCommentsLoader.classList.toggle('hidden', commentsToShow >= totalComments);
 
-  visibleСomments += COMMENTS_SHOWN;
+  visibleComments += COMMENTS_SHOWN;
 };
 
 export const openBigPicture = (photoData) => {
