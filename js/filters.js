@@ -1,13 +1,16 @@
 import { renderGallery, clearGallery, getGalleryData } from './gallery.js';
+import { debounce } from './utils.js';
 
-const filtersContainer = document.querySelector('.img-filters');
-let activeFilterButton = filtersContainer.querySelector('.img-filters__button--active');
+const RERENDER_DELAY = 500;
 
 const filterName = {
   FILTER_RANDOM: 'filter-random',
   FILTER_DISCUSSED: 'filter-discussed',
   FILTER_DEFAULT: 'filter-default'
 };
+
+const filtersContainer = document.querySelector('.img-filters');
+let activeFilterButton = filtersContainer.querySelector('.img-filters__button--active');
 
 const shuffleArray = (data) =>
   data.toSorted(() => Math.random() - 0.5);
@@ -34,7 +37,7 @@ const getFilteredData = (filterId) => {
 const handleFilterClick = (evt) => {
   const button = evt.target.closest('.img-filters__button');
 
-  if (!button || button === activeFilterButton) {
+  if (!button) {
     return;
   }
 
@@ -48,7 +51,8 @@ const handleFilterClick = (evt) => {
   const filteredData = getFilteredData(button.id);
 
   clearGallery();
-  renderGallery(filteredData);
+
+  debounce(() => renderGallery(filteredData), RERENDER_DELAY)();
 };
 
 export const initFilters = () => {
