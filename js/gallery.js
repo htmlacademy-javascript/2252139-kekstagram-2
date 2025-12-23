@@ -21,6 +21,8 @@ export const setGalleryData = (data) => {
   galleryData = data;
 };
 
+export const getGalleryData = () => galleryData;
+
 const getPhotoById = (id) => galleryData.find((photo) => photo.id === id);
 
 export const renderGallery = (data) => {
@@ -46,3 +48,9 @@ pictureList.addEventListener('click', (evt) => {
 
   openBigPicture(photoData);
 });
+
+export const clearGallery = () => {
+  const galleryItems = document.querySelectorAll('.picture');
+
+  galleryItems.forEach((item) => item.remove());
+};

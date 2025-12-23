@@ -16,12 +16,12 @@ const bigPictureCommentsLoader = bigPicture.querySelector('.comments-loader');
 let visibleСomments = COMMENTS_SHOWN;
 let currentPhotoData = null;
 
-function onDocumentKeydown (evt){
+const onDocumentKeydown = (evt) => {
   if (isEscapeKey(evt.key)) {
     evt.preventDefault();
     closePhotoModal();
   }
-}
+};
 
 export function closePhotoModal () {
   bigPicture.classList.add('hidden');

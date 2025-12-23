@@ -123,3 +123,4 @@ const onBiggerClick = () => scalePhoto(ScaleDirection.BIGGER);
 
 scaleSmallerButton.addEventListener('click', onSmallerClick);
 scaleBiggerButton.addEventListener('click', onBiggerClick);
+

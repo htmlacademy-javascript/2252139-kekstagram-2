@@ -1,60 +1,24 @@
-import {renderGallery, setGalleryData} from './gallery.js';
-import {showErrorMessage} from './utils.js';
+import {showError, showSuccess} from './dialogs.js';
 import { onCloseImageEditor } from './upload-picture.js';
+import { sendPhoto } from './api.js';
 
 const hashtagPattern = /^#[a-zа-яё0-9]{1,19}$/i;
 const MAX_HASHTAGS = 5;
 const MAX_DESCRIPTION_LEN = 140;
-const imgUploadForm = document.querySelector('.img-upload__form');
-const imgUploadSubmit = imgUploadForm.querySelector('.img-upload__submit');
-const descriptionInput = imgUploadForm.querySelector('.text__description');
-const hashtagsInput = imgUploadForm.querySelector('.text__hashtags');
-
-const BASE_URL = 'https://31.javascript.htmlacademy.pro/kekstagram';
-const Route = {
-  GET_DATA: '/data',
-  SEND_DATA: '/',
-};
-const Method = {
-  GET: 'GET',
-  POST: 'POST',
-};
-const ErrorText = {
-  GET_DATA: 'Не удалось загрузить данные. Попробуйте обновить страницу',
-  SEND_DATA: 'Не удалось отправить форму. Попробуйте ещё раз',
+const errorMessage = {
+  INVALID_HASHTAG: 'Введён невалидный хэштег',
+  DESCRIPTION_TOO_LONG: 'Длина комментария больше 140 символов',
+  HASHTAGS_TOO_MUCH: `Не более ${MAX_HASHTAGS} хэштегов`,
+  HASHTAGS_UNIQUE:'Хэштеги повторяются.'
 };
 const SubmitButtonText = {
   IDLE: 'Сохранить',
   SENDING: 'Сохраняю...'
 };
-
-
-const load = (route, errorText, method = Method.GET, body = null) =>
-  fetch(`${BASE_URL}${route}`, {method, body})
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error();
-      }
-      return response.json();
-    })
-    .catch(() => {
-      throw new Error(errorText);
-    });
-
-const getData = () => load(Route.GET_DATA, ErrorText.GET_DATA);
-
-export const sendData = (body) => load(Route.SEND_DATA, ErrorText.SEND_DATA, Method.POST, body);
-
-getData()
-  .then((gallery) => {
-    renderGallery(gallery);
-    setGalleryData(gallery);
-  })
-  .catch(
-    (err) => {
-      showErrorMessage(err.message);
-    }
-  );
+const imgUploadForm = document.querySelector('.img-upload__form');
+const imgUploadSubmit = imgUploadForm.querySelector('.img-upload__submit');
+const descriptionInput = imgUploadForm.querySelector('.text__description');
+const hashtagsInput = imgUploadForm.querySelector('.text__hashtags');
 
 const toggleSubmitButton = (disabled) => {
   imgUploadSubmit.disabled = disabled;
@@ -69,33 +33,31 @@ const pristine = new Pristine(imgUploadForm, {
   errorTextClass: 'img-upload__field-wrapper--error'
 });
 
-const isHashtagsValid = (value) => {
+const getHashtags = (value) => {
   const trimmedValue = value.trim();
+  return trimmedValue === '' ? [] : trimmedValue.split(/\s+/);
+};
 
-  if (trimmedValue === '') {
-    return true;
-  }
+const isHashtagsValid = (value) =>
+  getHashtags(value).every((hashtag) => hashtagPattern.test(hashtag));
 
-  const hashtagsArray = trimmedValue.split(/\s+/);
+const isHashtagsCountValid = (value) =>
+  getHashtags(value).length <= MAX_HASHTAGS;
 
-  if (hashtagsArray.length > MAX_HASHTAGS) {
-    return false;
-  }
+const isHashtagsUnique = (value) => {
+  const hashtags = getHashtags(value);
+  const uniqueHashtags = new Set(hashtags.map((h) => h.toLowerCase()));
 
-  const uniqueHashtags = new Set(hashtagsArray.map((h) => h.toLowerCase()));
-
-  if (uniqueHashtags.size !== hashtagsArray.length) {
-    return false;
-  }
-
-  return hashtagsArray.every((hashtag) => hashtagPattern.test(hashtag));
+  return uniqueHashtags.size === hashtags.length;
 };
 
 const isDescriptionValid = (value) =>
   value.trim() === '' || value.length <= MAX_DESCRIPTION_LEN;
 
-pristine.addValidator(hashtagsInput, isHashtagsValid, 'введён невалидный хэштег');
-pristine.addValidator(descriptionInput, isDescriptionValid, 'длина комментария больше 140 символов.');
+pristine.addValidator(hashtagsInput, isHashtagsValid, errorMessage.INVALID_HASHTAG);
+pristine.addValidator(descriptionInput, isDescriptionValid, errorMessage.DESCRIPTION_TOO_LONG);
+pristine.addValidator(hashtagsInput, isHashtagsCountValid, errorMessage.HASHTAGS_TOO_MUCH);
+pristine.addValidator(hashtagsInput, isHashtagsUnique, errorMessage.HASHTAGS_UNIQUE);
 
 imgUploadForm.addEventListener('submit', async (evt) => {
   evt.preventDefault();
@@ -105,17 +67,13 @@ imgUploadForm.addEventListener('submit', async (evt) => {
     try {
       toggleSubmitButton(true);
 
-      await sendData(new FormData(evt.target));
+      await sendPhoto(new FormData(evt.target));
+      showSuccess();
       onCloseImageEditor();
     } catch (err) {
-      showErrorMessage(err.message);
+      showError(err.message);
     } finally {
       toggleSubmitButton(false);
     }
-  } else {
-    hashtagsInput.style.borderColor = 'red';
-
-    hashtagsInput.focus();
   }
 });
-
